@@ -1,0 +1,6 @@
+BotMuraj is intented to be a IRC channel bot that was customizable and easy to develop for, built entirely in Python.
+Check out the wiki page: http://wiki.github.com/muraj/BotMuraj
+Some credits go out to:
+* Cort Stratton ([http://pyaiml.sourceforge.net/]) --- Used for aimltalk module.
+* Ziz and the developers of the TriviaBot Curse ([http://tinyurl.com/ltxrrc]) --- Used for the triviabot module.
+* IRC peeps on #nmu --- (more information @ http://csc.nmu.edu/)
