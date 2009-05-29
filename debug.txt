@@ -1,0 +1,55 @@
+Loading brain from ./aiml/IRCBot.brn... done (43354 categories in 1.49 seconds)
+:csc.nmu.edu 001 BotMuraj2 :Welcome to the USLUG IRC Network BotMuraj2!BotMuraj2@vr.nmu.edu
+:csc.nmu.edu 002 BotMuraj2 :Your host is csc.nmu.edu, running version Unreal3.2.7
+:csc.nmu.edu 003 BotMuraj2 :This server was created Wed Nov 28 2007 at 14:09:04 EST
+:csc.nmu.edu 004 BotMuraj2 csc.nmu.edu Unreal3.2.7 iowghraAsORTVSxNCWqBzvdHtGp lvhopsmntikrRcaqOALQbSeIKVfMCuzNTGj
+:csc.nmu.edu 005 BotMuraj2 NAMESX SAFELIST HCN MAXCHANNELS=30 CHANLIMIT=#:30 MAXLIST=b:60,e:60,I:60 NICKLEN=30 CHANNELLEN=32 TOPICLEN=307 KICKLEN=307 AWAYLEN=307 MAXTARGETS=20 WALLCHOPS :are supported by this server
+:csc.nmu.edu 005 BotMuraj2 WATCH=128 SILENCE=15 MODES=12 CHANTYPES=# PREFIX=(qaohv)~&@%+ CHANMODES=beI,kfL,lj,psmntirRcOAQKVCuzNSMTG NETWORK=USLUG CASEMAPPING=ascii EXTBAN=~,cqnr ELIST=MNUCT STATUSMSG=~&@%+ EXCEPTS INVEX :are supported by this server
+:csc.nmu.edu 005 BotMuraj2 CMDS=KNOCK,MAP,DCCALLOW,USERIP :are supported by this server
+:csc.nmu.edu 251 BotMuraj2 :There are 8 users and 55 invisible on 4 servers
+:csc.nmu.edu 252 BotMuraj2 10 :operator(s) online
+:csc.nmu.edu 254 BotMuraj2 29 :channels formed
+:csc.nmu.edu 255 BotMuraj2 :I have 19 clients and 1 servers
+:csc.nmu.edu 265 BotMuraj2 :Current Local Users: 19  Max: 33
+:csc.nmu.edu 266 BotMuraj2 :Current Global Users: 63  Max: 76
+:csc.nmu.edu 375 BotMuraj2 :- csc.nmu.edu Message of the Day - 
+:csc.nmu.edu 372 BotMuraj2 :- 8/10/2008 1:29
+:csc.nmu.edu 372 BotMuraj2 :-                    _____
+:csc.nmu.edu 372 BotMuraj2 :-                   /     \                             +------------+
+:csc.nmu.edu 372 BotMuraj2 :-  +-------------+  vvvvvvv  /|__/|                     | NORTHERN   |
+:csc.nmu.edu 372 BotMuraj2 :-  | Part of the |     I   /O,O   |                     | MICHIGAN   |
+:csc.nmu.edu 372 BotMuraj2 :-  |  USLUG IRC  |     I /_____   |      /|/|           | UNIVERSITY |
+:csc.nmu.edu 372 BotMuraj2 :-  |   Network   |     J/^ ^ ^ \  |    /00  |    _//|   | COMPUTER   |
+:csc.nmu.edu 372 BotMuraj2 :-  +-------------+     |^ ^ ^ ^ |W|   |/^^\ |   /oo |   | SCIENCE    |
+:csc.nmu.edu 372 BotMuraj2 :- _______| |___________ \m___m__|_| __ \m_m_| _ \mm_| __| COMMUNITY  |_____ _ _
+:csc.nmu.edu 372 BotMuraj2 :- 
+:csc.nmu.edu 372 BotMuraj2 :- Rules:
+:csc.nmu.edu 372 BotMuraj2 :-   0. Use of this server indicates your acceptance of,
+:csc.nmu.edu 372 BotMuraj2 :-      and agreement to be bound by, the NMU Acceptable Use Policy, which
+:csc.nmu.edu 372 BotMuraj2 :-      can be read at:
+:csc.nmu.edu 372 BotMuraj2 :-      http://www.acs.nmu.edu/7.1.php
+:csc.nmu.edu 372 BotMuraj2 :-   1. No user-run bots
+:csc.nmu.edu 372 BotMuraj2 :-   2. No unnecessary clones/dupes
+:csc.nmu.edu 372 BotMuraj2 :-   3. If it's illegal, don't do it on this network.
+:csc.nmu.edu 372 BotMuraj2 :-   4. No Flooding or Spamming (Use the pastebin at http://lug.mtu.edu/pastebin/)
+:csc.nmu.edu 372 BotMuraj2 :-   5. Unicode nicks are OK, but the first character must be from the ASCII
+:csc.nmu.edu 372 BotMuraj2 :-      character subset and the nick must contain at least one printable
+:csc.nmu.edu 372 BotMuraj2 :-      character.
+:csc.nmu.edu 372 BotMuraj2 :- 
+:csc.nmu.edu 372 BotMuraj2 :- Please consider using a secure (SSL) connection to port 6669
+:csc.nmu.edu 372 BotMuraj2 :-   (use stunnel for clients without native SSL support)
+:csc.nmu.edu 372 BotMuraj2 :- 
+:csc.nmu.edu 372 BotMuraj2 :- New to Linux and/or IRC? Try "/join #nmu" or "/join #mtu" 
+:csc.nmu.edu 376 BotMuraj2 :End of /MOTD command.
+:BotMuraj2 MODE BotMuraj2 :+iw
+:BotMuraj2!BotMuraj2@vr.nmu.edu JOIN :#test
+:csc.nmu.edu 332 BotMuraj2 #test :PENSI!
+:csc.nmu.edu 333 BotMuraj2 #test NUXI|drinky 1235193841
+:csc.nmu.edu 353 BotMuraj2 = #test :BotMuraj2 dpn-scriptz aboyne @muraj 
+:csc.nmu.edu 366 BotMuraj2 #test :End of /NAMES list.
+:muraj!cperry@localhost PRIVMSG #test :BotMuraj2: alias r='screen -raAdU'
+:muraj!cperry@localhost PRIVMSG #test :alias la='ls -laF'
+:muraj!cperry@localhost PRIVMSG #test :export PS1="\\u@\\h:\\w\\$ "
+:csc.nmu.edu 421 BotMuraj2 P :Unknown command
+:muraj!cperry@localhost PRIVMSG #test :gr
+:muraj!cperry@localhost PRIVMSG #test :BotMuraj2: hello
