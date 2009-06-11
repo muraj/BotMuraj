@@ -46,7 +46,7 @@ def PROCESS(bot, args, text):
 				global SCORES
 				bot.mesg("That is correct! The answer was \"%s\". 1 point was awarded to %s." % (ans, args[-2]), args[1], args[-1])
 				if SCORES.has_key(args[-2]): SCORES[args[-2]] += 1
-				else: SCORES[args[-2]]=0
+				else: SCORES[args[-2]]=1
 				TIMER_EVENT.set()
 				reset()
 				break

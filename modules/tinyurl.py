@@ -5,6 +5,7 @@ import urllib
 import re
 import socket
 import sys
+import htmllib
 RULE=r'(?i).*\b(http:\/\/\S+)\b.*'
 PRIORITY=0
 COMMAND='PRIVMSG'
@@ -27,12 +28,11 @@ def PROCESS(bot, args, text):
 			html=f.read(8096)	#Should grab most titles
 			group=re.search(r'(?i)(?:\<title\>)(.*)(?:\<\/title\>)',html, re.DOTALL)
 			if group:
-				title=group.group(1)
-				title=title.replace('&quot;','\"')
-				title=title.replace('&lt;','<')
-				title=title.replace('&gt;','>')
-				title=title.replace('&#8230;','...')
-				title=title.strip()
+				title=unicode(group.group(1),'utf-8')
+				for k, v in htmllib.HTMLParser.entitydefs.iteritems():
+					if not v.startswith('&#'): title=title.replace('&%s;' % k,unicode(v,'latin-1'))
+					else: title=title.replace('&%s;' % k, v)
+				title=re.sub(r'&#(\d+);',lambda m: unichr(int(m.group(1))),title)
 			else:
 				title="N/A"
 		else: title=f.info().subtype
@@ -49,7 +49,7 @@ def PROCESS(bot, args, text):
 		socket.setdefaulttimeout(10)
 		f=urllib.urlopen("%s%s" % (TINYURL, url))
 		returl=f.read().rstrip()
-		if not re.match(r'^(((https?|ftp):\/\/)|www\.)(([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|net|org|info|biz|gov|name|edu|[a-zA-Z][a-zA-Z]))(:[0-9]+)?((\/|\?)[^ "]*[^ ,;\.:">)])?$', returl):
+		if not re.match(r'(?i)^(http:\/\/\S+)$', returl):
 			print >> sys.stderr, "Bad url", returl
 			return False
 	except Exception as e:
