@@ -74,6 +74,7 @@ class Bot(asynchat.async_chat):
 			if arg[1]==self.nick:
 				arg[1]=arg[-1]
 				_directed = True
+			if self.nick in text: _directed = True	#Not sure I want this.
 		if not self.mods.has_key(arg[0]): return
 		for m in self.mods[arg[0]]:
 			if re.match(m.RULE, text):
