@@ -7,7 +7,6 @@ RULE1 = r'(?i)^trivia(\sscores)?' #Start game state
 RULE2 = r'.*'	#Recieve Answer state
 TIMER=60 #seconds
 TIMER_EVENT=threading.Event()
-SCORES={}
 CON = sqlite3.connect('modules/triviadb')
 ANSWER = []
 ###MODULE GLOBAL DEFINES
@@ -43,10 +42,8 @@ def PROCESS(bot, args, text):
 	if RULE == RULE2:
 		for ans in ANSWER:
 			if text.lower() == ans.lower():
-				global SCORES
 				bot.mesg("That is correct! The answer was \"%s\". 1 point was awarded to %s." % (ans, args[-2]), args[1], args[-1])
-				if SCORES.has_key(args[-2]): SCORES[args[-2]] += 1
-				else: SCORES[args[-2]]=1
+				set_score(args[-2], 1)
 				TIMER_EVENT.set()
 				reset()
 				break
@@ -59,14 +56,21 @@ def PROCESS(bot, args, text):
 		TIMER_EVENT.clear()
 		timer(TIMER_EVENT, bot, ANSWER, args[1]).start()
 	return False
+def set_score(user, score):
+	global CON
+	c = CON.execute("select * from scores where user = ?", (user,))
+	c = c.fetchall()
+	if len(c)==0:
+		CON.execute("insert into scores values (?,1)", (user,))
+	else:
+		CON.execute("update scores set score = ? where user = ?", (c[0][1]+score, user, ))
+	CON.commit()
 def outScores(bot, chan):
-	global SCORES
-	i=10
+	global CON
 	bot.mesg('### TOP SCORES ###', chan)
-	for k,v in SCORES.iteritems():
-		if i==0: break
-		bot.mesg("%-10s %d" % (k, v), chan)
-		i=i-1
+	recs=CON.execute('select * from scores order by score limit 10').fetchall()
+	for record in recs:
+		bot.mesg("%-10s %d" % (record[0], record[1]), chan)
 def getQ():
 	global CON
 	r = CON.execute('select * from trivia order by Random() limit 1')

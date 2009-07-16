@@ -47,12 +47,15 @@ def PROCESS(bot, args, text):
 	im=im.resize((im.size[0],im.size[1]/2),Image.ANTIALIAS)	#For maintaining aspect ratio in ascii
 	im.thumbnail((80,30), Image.ANTIALIAS)
 	#-----
+	print 'getdata',list(im.getdata())
 	origcolordata=list(im.getdata())
 	colordata=[]
 	for color in origcolordata:
+		print 'color',color
 		besti=0	#Default to white
 		best_dist=0xFFFFFF
 		for i,colorcheck in enumerate(colors):
+			print 'colorcheck',colorcheck
 			test=sqrt((color[0]-colorcheck[0])**2+(color[1]-colorcheck[1])**2+(color[2]-colorcheck[2])**2)
 			if best_dist >= test:
 				besti=i

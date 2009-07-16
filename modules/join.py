@@ -2,19 +2,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
-RULE='^join\s#[A-Za-z0-9\-]+'
+RULE='^join\s#[^\s,]+'
 PRIORITY=-10
 COMMAND='PRIVMSG'
 DIRECTED=True
 def PROCESS(bot, args, text):
-	chan=re.search('#([A-Za-z0-9\-]+)', text)
-	if not chan:
+	chans=re.search(r'((#[^\s,]+),?)+', text)
+	if not chans:
 		bot.mesg('Channel not found', args[1])
 		return False
-	chan=chan.group(0)
-	if chan in bot.chans:
-		bot.mesg('Channel already joined.', args[1])
-		return False
-	bot.joinchan(chan)
-	bot.mesg("Channel %s joined" % chan, args[1])
+	chans=chans.group(0).split(',')
+	for chan in chans:
+		if chan in bot.chans:
+			bot.mesg("Channel %s already joined." % chan, args[1])
+		else:
+			bot.joinchan(chan)
+			bot.mesg("Channel %s joined" % chan, args[1])
 	return False
