@@ -6,6 +6,8 @@ import re
 import socket
 import sys
 import htmllib
+import httplib
+httplib.HTTPConnection.debuglevel = 1
 RULE=r'(?i).*\b(http:\/\/\S+)\b.*'
 PRIORITY=0
 COMMAND='PRIVMSG'
@@ -13,8 +15,8 @@ MINSIZE=45
 TINYURL='http://ze.nu/api-create.php?url='
 =======
 MINSIZE=60
-#TINYURL='http://ze.nu/api-create.php?url='
 TINYURL='http://tinyurl.com/api-create.php?url='
+#TINYURL='http://tinyurl.com/api-create.php?url='
 class Opener(urllib.FancyURLopener):
 	version='Mozilla/5.0'
 def PROCESS(bot, args, text):
