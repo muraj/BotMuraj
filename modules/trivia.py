@@ -47,7 +47,7 @@ def PROCESS(bot, args, text):
 				TIMER_EVENT.set()
 				reset()
 				break
-		else: print ANSWER, "GUESS:", text	#Debug answer
+	#	else: print ANSWER, "GUESS:", text	#Debug answer
 	elif text == 'trivia':
 		q, ANSWER = getQ()
 		answer_state()

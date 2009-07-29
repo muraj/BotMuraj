@@ -7,7 +7,7 @@ import socket
 import sys
 import htmllib
 import httplib
-httplib.HTTPConnection.debuglevel = 1
+#httplib.HTTPConnection.debuglevel = 0
 RULE=r'(?i).*\b(http:\/\/\S+)\b.*'
 PRIORITY=0
 COMMAND='PRIVMSG'
@@ -29,7 +29,6 @@ def PROCESS(bot, args, text):
 	if len(url) < MINSIZE and (not text.startswith('tinyurl ')): return True
 	title="N/A"
 	f=None
-	print "URL:("+url+")"
 	try:
 		socket.setdefaulttimeout(3)
 		f=urllib.urlopen(url)
