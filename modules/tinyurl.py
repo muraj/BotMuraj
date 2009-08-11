@@ -80,5 +80,5 @@ def PROCESS(bot, args, text):
 				bot.mesg("I have not joined that channel.",args[1])
 			bot.mesg("%s posted: %s \"%.*s...\"" % (args[-1], returl, 50, title), chan)
 			return False
-	bot.mesg("Tiny: %c%c%s%c \"%.*s...\"" % (chr(02), chr(31), returl, chr(15), 50, title ), args[1])
+	bot.mesg("Tiny: \x02\x1F%s\x0F \"%.*s...\"" % (returl, 50, title ), args[1])
 	return False
