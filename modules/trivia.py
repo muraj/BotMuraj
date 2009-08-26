@@ -1,4 +1,4 @@
-"""Trivia questions!  Type 'trivia' to start a question.  Scores are recorded by user, not by nick.  To see your score, type 'trivia scores'"""
+"""Trivia questions!  ***Only works in #trivia for flooding reasons***  Type 'trivia' to start a question.  Scores are recorded by user, not by nick.  To see your score, type 'trivia scores'"""
 import random
 import threading
 import sqlite3
@@ -27,7 +27,7 @@ class timer(threading.Thread):
 		global TIMER
 		self.event.wait(TIMER)
 		if not self.event.isSet():		#No one has answered yet and time is up!
-			self.bot.mesg("Time\'s up!  The answer was \"%s\"." % ' or '.join(self.answer), self.chan)
+			self.bot.mesg(u"Time\'s up!  The answer was \"\u000304%s\u000F\"." % ' or '.join(self.answer), self.chan)
 			self.event.set()
 def PROCESS(bot, args, text):
 	global TIMER, TIMER_EVENT, RULE, PRIORITY, RULE2, ANSWER
@@ -42,7 +42,7 @@ def PROCESS(bot, args, text):
 	if RULE == RULE2:
 		for ans in ANSWER:
 			if text.lower() == ans.lower():
-				bot.mesg("That is correct! The answer was \"%s\". 1 point was awarded to %s." % (ans, args[-2]), args[1], args[-1])
+				bot.mesg(u"That is correct! The answer was \u000302\"%s\"\u000F. 1 point was awarded to \u000313%s\u000F." % (ans, args[-2]), args[1], args[-1])
 				set_score(args[-2], 1)
 				TIMER_EVENT.set()
 				reset()
@@ -52,7 +52,7 @@ def PROCESS(bot, args, text):
 		q, ANSWER = getQ()
 		answer_state()
 		bot.mesg("OKAY! Answer this question in %d seconds:" % (TIMER), args[1])
-		bot.mesg(q, args[1])
+		bot.mesg(u"\u000309%s\u000F" % (q), args[1])
 		TIMER_EVENT.clear()
 		timer(TIMER_EVENT, bot, ANSWER, args[1]).start()
 	return False
