@@ -9,6 +9,6 @@ COMMAND='PRIVMSG'
 DIRECTED=True
 def PROCESS(bot, args, text):
 	reply=commands.getoutput('fortune -s')
-	reply=reply.replace('\t','   ').replace('\n','               ')
+	reply=reply.replace('\t','   ').replace('\n',' ')
 	bot.mesg(reply, args[1])
 	return False

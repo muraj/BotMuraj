@@ -21,7 +21,8 @@ def PROCESS(bot, args, text):
 		for i, mod in enumerate(mods):
 			if mod.__name__==text[7:] or text[7:]=='all':
 				del mods[i] #COMMAND could have changed, so delete it from the dict
-				bot.addhook(bot.modimport(text[7:]))
+				bot.log(mod.__name__)
+				bot.addhook(bot.modimport(mod.__name__))
 				break
 		else: continue
 		break
@@ -32,7 +33,7 @@ def PROCESS(bot, args, text):
 			bot.addhook(bot.modimport(text[7:]))
 	except ImportError as e:
 		bot.mesg(''+e,args[1])
-		print >> sys.stderr, 'RELOAD EXCEPTION:',e
+		bot.log('RELOAD EXCEPTION: %s' % (e), 'critical')
 	finally:
 		imp.release_lock()
 		for k,l in bot.mods.iteritems():

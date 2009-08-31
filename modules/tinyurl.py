@@ -16,7 +16,6 @@ TINYURL='http://ze.nu/api-create.php?url='
 =======
 MINSIZE=60
 TINYURL='http://tinyurl.com/api-create.php?url='
-#TINYURL='http://tinyurl.com/api-create.php?url='
 class Opener(urllib.FancyURLopener):
 	version='Mozilla/5.0'
 def PROCESS(bot, args, text):
@@ -47,9 +46,8 @@ def PROCESS(bot, args, text):
 				title="N/A"
 		else: title=f.info().subtype
 	except Exception as e:
-		print "Error reading title from url."
+		bot.log('Error reading title from url.', 'error')
 	finally:
-                print "Closing!"
 		if f != None:
 			f.fp.close()
 			f.close()
@@ -60,14 +58,13 @@ def PROCESS(bot, args, text):
 		f=urllib.urlopen("%s%s" % (TINYURL,  url))
 		returl=f.read().rstrip()
 		if not re.match(r'(?i)^(http:\/\/\S+)$', returl):
-			print >> sys.stderr, "Bad url", returl
+			bot.log("Bad url returned: %s" % (returl), 'warning')
 			return False
 	except Exception as e:
-		print 'Cannot contact tinyurl!'
+		bot.log('Cannot contact tinyurl!','critical')
 		bot.mesg('Error contacting tinyurl.com', args[1])
 		raise e
 	finally:
-                print "Closing tiny!"
 		if f != None:
 			f.fp.close()
 			f.close()

@@ -15,7 +15,6 @@ def PROCESS(bot, args, text):
 	text=text.replace('\x01ACTION','I')	#To replace actions sent in irc
 	text=text.replace(bot.nick,'you')
 	text=text.replace('\x01','')
-	print text
 ###
 	aimlkernel.setPredicate('name', args[-1], args[1])
 	response=aimlkernel.respond(text, args[1])

@@ -25,7 +25,7 @@ def PROCESS(bot, args, text):
 	times.reverse()
 	bot.mesg("I\'ve been up for %s and %s!" % (' '.join(times[:-1]), times[-1]), args[1])
 	if text=='penis':
-		shaft=chr(3)+'138='
+		shaft='\x03138='
 		for i in xrange(0,int(s*SCALE)): shaft+='='
 		shaft+='D'
 		bot.mesg(shaft, args[1])

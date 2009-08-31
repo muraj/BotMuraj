@@ -7,9 +7,9 @@ NICK	=	'BotMuraj2'
 CHAN	=	['#test']
 MASTER	=	'muraj'
 
-import socket, asyncore, asynchat, sys, re, imp, glob, os, traceback
+import socket, asyncore, asynchat, sys, re, imp, glob, os, traceback, logging
 class Bot(asynchat.async_chat):
-	def __init__(self, nick, chs, master):
+	def __init__(self, nick, chs, master, log=None, log_level=None):
 		self.nick=nick
 		self.master=master
 		asynchat.async_chat.__init__(self)
@@ -17,6 +17,9 @@ class Bot(asynchat.async_chat):
 		self.buffer=''
 		self.origin=re.compile(r'([^!]*)!?([^@]*)@?(.*)')
 		self.chans=[chan for chan in chs]
+		if not log == None:
+			logging.basicConfig(level=log_level, filename=log, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+		os.chdir(os.path.split(os.path.abspath(__file__))[0])	#Keeping everything relative to the root directory structure
 		self.mods={}
 		paths=glob.glob('./modules/*.py')
 		for f in paths:			#Error checking here.
@@ -38,10 +41,10 @@ class Bot(asynchat.async_chat):
 		desc=('.py','r',imp.PY_SOURCE)
 		m=imp.load_module(os.path.split(fn[:-3])[1], f, fn, desc)
 		if self.checkmod(m):
-			print >> sys.stderr, 'LOADED MODULE: %s' % m.__name__
+			logging.info('Loaded Module: %s' % m.__name__)
 			return m
 		else:
-			print >> sys.stderr, "MODULE IS NOT VALID: %s" % m.__name__
+			logging.warning('Module is not valid!: %s' % m.__name__)
 			return None
 	def connectServer(self, host, port=6667):
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -83,19 +86,25 @@ class Bot(asynchat.async_chat):
 						continue	#Skip if not directed and is supposed to be
 					if not m.PROCESS(self, arg, text): break
 				except:
-					type, value, trace=sys.exc_info()
-					traceback.print_exception(type, value, trace, file=sys.stderr)
-					print >> sys.stderr, 'Input:', arg, repr(text)
+					e=sys.exc_info()
+					logging.error('Input: %s, \"%s\"', arg, text, exc_info=e)
 					if arg[0] == 'PRIVMSG':
-						self.mesg('I am terribly sorry, but it seems that I have had an exception while parsing your message.  Please review my logs to see why.',arg[1])
+						self.mesg('I am terribly sorry, but it seems that I have had an exception while parsing your message.  Please review my logs to see why.', arg[1])
 					break
 	def handle_connect(self):
 		self.write('NICK',[self.nick])
 		self.write('USER',[self.nick,self.nick,self.nick,self.nick])
 		self.write('JOIN',[ ','.join(self.chans) ])
 	def handle_close(self):
-		print >> sys.stderr, 'Socket Closed'
+		logging.critical('Socket Closed')
 		exit(1)
+	def log(self, msg, lvl='debug'):
+		ll={'critical': logging.CRITICAL,
+			'error': logging.ERROR,
+			'warning': logging.WARNING,
+			'info':	logging.INFO,
+			'debug': logging.DEBUG }.get(lvl,logging.NOTSET)
+		logging.log(ll,msg)
 	def write(self, cmd, args, text=None):
 		args=' '.join([arg.replace('\r\n','').replace('\t','   ') for arg in args])
 		if isinstance(args,unicode): args=args.encode('utf-8')
@@ -120,6 +129,16 @@ class Bot(asynchat.async_chat):
 		self.chans.append(chan)
 		#Information caching needed here.
 if __name__=='__main__':
-	bot=Bot(NICK, CHAN, MASTER)
+	import optparse
+	parser = optparse.OptionParser()
+	parser.add_option('-l','--logging-level',help='Logging Level')
+	parser.add_option('-f','--logging-file',help='Logging Filename')
+	(options, args) = parser.parse_args()
+	ll={'critical': logging.CRITICAL,
+		'error': logging.ERROR,
+		'warning': logging.WARNING,
+		'info':	logging.INFO,
+		'debug': logging.DEBUG }.get(options.logging_level,logging.NOTSET)
+	bot=Bot(NICK, CHAN, MASTER, log=options.logging_file, log_level=ll)
 	bot.connectServer(SERVER, PORT)
 	bot.run()
