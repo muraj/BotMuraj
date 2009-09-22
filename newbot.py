@@ -82,8 +82,9 @@ class Bot(asynchat.async_chat):
 		for m in self.mods[arg[0]]:
 			if re.match(m.RULE, text):
 				try:
-					if arg[0] == "PRIVMSG" and hasattr(m,"DIRECTED") and not ((_directed) and m.DIRECTED):	#yes, I know...
-						continue	#Skip if not directed and is supposed to be
+					if arg[0] == "PRIVMSG":	#yes, I know...
+						if not((_directed and m.DIRECTED&1) or (not _directed and m.DIRECTED&2)):
+							continue	#Skip if not directed and is supposed to be
 					if not m.PROCESS(self, arg, text): break
 				except:
 					e=sys.exc_info()
@@ -118,6 +119,7 @@ class Bot(asynchat.async_chat):
 		if not hasattr(m,'PRIORITY'): return False
 		if not (hasattr(m,'PROCESS') and callable(m.PROCESS)): return False
 		if not hasattr(m,'COMMAND'): return False
+		if not hasattr(m,'DIRECTED'): m.DIRECTED = True	#Default to directed
 		if hasattr(m,'INIT') and callable(m.INIT): 
 			m.INIT(self)	#Optional initialization
 		return True

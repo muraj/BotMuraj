@@ -7,7 +7,7 @@ import re
 RULE=r'^weather(\s\d{5})?$'
 PRIORITY=-10
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed at
 def PROCESS(bot, args, text):
 	zip=re.search('(\d{5})',text)
 	if not zip: zip='49855'

@@ -4,7 +4,7 @@
 RULE=r'.*'
 PRIORITY=9999
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 def PROCESS(bot, args, text):
 	bot.mesg(text,args[1])
 	return False

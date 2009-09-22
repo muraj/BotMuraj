@@ -13,7 +13,7 @@ ANSWER = []
 RULE=RULE1
 PRIORITY=0
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directly spoken to
 
 class timer(threading.Thread):
 	event=None

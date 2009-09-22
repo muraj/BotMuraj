@@ -4,7 +4,7 @@ import urllib
 RULE=r'^gcalc (.+)$'
 PRIORITY=0
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 class Opener(urllib.FancyURLopener):	#Needed to grab google searches (it doesn't like urllib user-agent)
 	version='Mozilla/5.0'
 def PROCESS(bot, args, text):

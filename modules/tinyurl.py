@@ -16,6 +16,7 @@ TINYURL='http://ze.nu/api-create.php?url='
 =======
 MINSIZE=60
 TINYURL='http://tinyurl.com/api-create.php?url='
+DIRECTED=3	#Can both be directed and not
 class Opener(urllib.FancyURLopener):
 	version='Mozilla/5.0'
 def PROCESS(bot, args, text):

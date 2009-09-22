@@ -6,7 +6,7 @@ import sys
 RULE=r'^fortune\b.*'
 PRIORITY=0
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 def PROCESS(bot, args, text):
 	reply=commands.getoutput('fortune -s')
 	reply=reply.replace('\t','   ').replace('\n',' ')

@@ -7,7 +7,7 @@ import re
 RULE = r'^(uptime)|(penis)$'
 PRIORITY = -9999
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1 #Must be directed to the bot
 #### CONFIGURATION
 SCALE = 80.0/31556926.0
 UNITS = ['second(s)','minute(s)','hour(s)','day(s)','month(s)','year(s)']

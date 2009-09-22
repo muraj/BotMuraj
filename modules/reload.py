@@ -6,7 +6,7 @@ import sys
 RULE=r'^reload [A-Za-z0-9]+$'
 PRIORITY=-9999
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 def PROCESS(bot, args, text):
 	if bot.master != args[-1]:
 		bot.mesg('No, you can\'t tell me what to do.',args[1])

@@ -6,7 +6,7 @@ import random
 RULE=r'(?i)^dance((\s(once|twice|thrice|\d+))|())'
 PRIORITY=0
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1 #Must be directed to the bot
 dancers=[
 		'\o/ ',
 		' |  ',

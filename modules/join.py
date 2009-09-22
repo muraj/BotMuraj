@@ -5,7 +5,7 @@ import re
 RULE='^join\s#[^\s,]+'
 PRIORITY=-10
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 def PROCESS(bot, args, text):
 	chans=re.search(r'((#[^\s,]+),?)+', text)
 	if not chans:

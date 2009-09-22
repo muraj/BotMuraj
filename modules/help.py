@@ -4,7 +4,7 @@
 RULE=r'^(explain\s.*)|(help)'
 PRIORITY=0
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 def PROCESS(bot, args, text):
 	words=text.split()
 	if len(words)==1 and words[0]=='help':

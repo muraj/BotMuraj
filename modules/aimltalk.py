@@ -7,7 +7,7 @@ from time import sleep
 RULE=r'.*'
 PRIORITY=500
 COMMAND='PRIVMSG'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 aimlkernel=aiml.Kernel()
 def PROCESS(bot, args, text):
 	global aimlkernel

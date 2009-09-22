@@ -11,7 +11,7 @@ PRIORITY=-20
 COMMAND='PRIVMSG'
 #GRADIENT='@8OCoc:. '
 GRADIENT='.:coCO8@'
-DIRECTED=True
+DIRECTED=1	#Must be directed to the bot
 # Via http://irssi.org/documentation/formats
 colors=[	(255, 255, 255),	#White
 		(0, 0, 0),		#Black (white is the new black)
