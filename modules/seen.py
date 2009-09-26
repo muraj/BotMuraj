@@ -17,7 +17,7 @@ def PROCESS(bot, args, text):
 					bot.mesg(u"%s is unknown" % (u), args[-1])
 				else: bot.mesg(last_seen(u,users[u]), args[-1])
 		else:
-			for i in users.itervalues():
+			for u,i in users.iteritems():
 				bot.mesg(last_seen(u,i), args[-1])
 		return False
 	users[args[-1]] = datetime.now()

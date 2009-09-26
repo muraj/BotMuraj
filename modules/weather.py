@@ -1,25 +1,32 @@
-"""Displays the weather using the following syntax: 'weather [zipcode]'"""
+"""Displays the weather using the following syntax: 'weather [zipcode|city, state]'"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import urllib
 from xml.dom import minidom
 import re
-RULE=r'^weather(\s\d{5})?$'
+RULE=r'^weather(\s\d{5}|\s[a-zA-z\.,\- ]*,\s*[A-Za-z]{2})?$'
 PRIORITY=-10
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed at
 def PROCESS(bot, args, text):
-	zip=re.search('(\d{5})',text)
-	if not zip: zip='49855'
-	else: zip=zip.group(0)
+	zip=text[8:]
+	if not zip or zip=='': zip='49855'
+	bot.log('ZIPCODE: '+zip,'debug')
 	strings=_process(zip)
 	for s in strings:
 		bot.mesg(s,args[1])
 	return False
 def _process(zip):
 	str=[" "]
-	url=urllib.urlopen('http://www.google.com/ig/api?weather='+zip)
-	doc=minidom.parse(url)
+	url=urllib.urlopen('http://www.google.com/ig/api?'+urllib.urlencode({'weather':zip}))
+	try:
+		doc=minidom.parse(url)
+	except:
+		return ['Google returned a malformed xml']
+	try:
+		e=doc.getElementsByTagName('problem_cause')[0].getAttribute('data')
+		return ["Google returned the following error: %s" % (e)]
+	except: pass
 	info = doc.getElementsByTagName('forecast_information')[0]
 	str.append("%s" % info.getElementsByTagName('city')[0].getAttribute('data'))
 	day = doc.getElementsByTagName('current_conditions')[0]
