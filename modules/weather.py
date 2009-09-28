@@ -10,8 +10,8 @@ COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed at
 def PROCESS(bot, args, text):
 	zip=text[8:]
-	if not zip or zip=='': zip='49855'
-	bot.log('ZIPCODE: '+zip,'debug')
+	if not zip or zip=='': zip='Marquette, MI'
+	bot.log('Place: '+zip,'debug')
 	strings=_process(zip)
 	for s in strings:
 		bot.mesg(s,args[1])

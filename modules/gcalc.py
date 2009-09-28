@@ -17,12 +17,13 @@ def PROCESS(bot, args, text):
 	urllib._urlopener = Opener()
 	f=urllib.urlopen("http://www.google.com/search?%s" % params)
 	str=f.read()
-	ret=re.search(r'<h2 class=r style="font-size:138%"><b>(.+)</b></h2>', str)
+	ret=re.search(r'<h2 class=r style="font-size:138%"><b>(.+?)</b></h2>', str)
 	f.close()
 	if not ret:
 		bot.mesg('No result', args[1])
 		return False
 	ret=re.sub(r'&#(\d+);',lambda m: unichr(int(m.group(1))),ret.group(1)) #html unicode parsing.
-	ret=re.sub(r'<sup>(.*)</sup>', lambda m: "^(%s)" % m.group(1),ret)	#Until I get to unicode superscripts, etc.
+	ret=re.sub(r'<sup>(.*?)</sup>', lambda m: "^(%s)" % m.group(1),ret)	#Until I get to unicode superscripts, etc.
+	ret=re.sub(r'<font[^>]*>(.*?)</font>', "",ret)
 	bot.mesg(ret, args[1])
 	return False

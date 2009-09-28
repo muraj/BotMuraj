@@ -8,7 +8,7 @@ import sys
 import htmllib
 import httplib
 #httplib.HTTPConnection.debuglevel = 0
-RULE=r'(?i).*\b(http:\/\/\S+)\b.*'
+RULE=r'(?i).*\b(http:\/\/\S+).*'
 PRIORITY=0
 COMMAND='PRIVMSG'
 MINSIZE=45
@@ -22,7 +22,7 @@ class Opener(urllib.FancyURLopener):
 def PROCESS(bot, args, text):
 	global TINYURL
 	urllib._urlopener=Opener()	#Changes the user-agent to Mozilla
-	groups=re.search(r'\b(http:\/\/\S+)\b',text)
+	groups=re.search(r'\b(http:\/\/\S+)',text)
 	if not groups:
 		return True
 	else: url=groups.group(0)
@@ -41,7 +41,7 @@ def PROCESS(bot, args, text):
 					if not v.startswith('&#'): title=title.replace('&%s;' % k,unicode(v,'latin-1'))
 					else: title=title.replace('&%s;' % k, v)
 				title=re.sub(r'&#(\d+);',lambda m: unichr(int(m.group(1))),title)
-				title=title.replace('\n','')
+				title=title.replace('\n','').replace('\r','')
 				title=title.strip()
 			else:
 				title="N/A"
