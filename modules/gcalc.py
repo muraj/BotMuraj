@@ -25,5 +25,6 @@ def PROCESS(bot, args, text):
 	ret=re.sub(r'&#(\d+);',lambda m: unichr(int(m.group(1))),ret.group(1)) #html unicode parsing.
 	ret=re.sub(r'<sup>(.*?)</sup>', lambda m: "^(%s)" % m.group(1),ret)	#Until I get to unicode superscripts, etc.
 	ret=re.sub(r'<font[^>]*>(.*?)</font>', "",ret)
+	ret=re.sub(r'<[^>]+>([^<]+)</[^>]+>','\g<1>',ret)	#Remove any tags I might have missed
 	bot.mesg(ret, args[1])
 	return False

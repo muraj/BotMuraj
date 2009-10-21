@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 SERVER	=	'csc.nmu.edu'
 PORT	=	6667
-NICK	=	'BotMuraj2'
+NICK	=	'BotMuraj'
 CHAN	=	['#test']
 MASTER	=	'muraj'
 
@@ -133,8 +133,8 @@ class Bot(asynchat.async_chat):
 if __name__=='__main__':
 	import optparse
 	parser = optparse.OptionParser()
-	parser.add_option('-l','--logging-level',help='Logging Level')
-	parser.add_option('-f','--logging-file',help='Logging Filename')
+	parser.add_option('-l','--logging-level',help='Set logging level: one of \'critical\', \'error\', \'warning\', \'info\', \'debug\'',metavar="MODE")
+	parser.add_option('-f','--logging-file',help='Log to FILE',metavar="FILE")
 	(options, args) = parser.parse_args()
 	ll={'critical': logging.CRITICAL,
 		'error': logging.ERROR,
