@@ -2,8 +2,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import urllib
-from xml.dom import minidom
-import re
+#from xml.dom import minidom
+import xml.etree.ElementTree
 RULE=r'^weather(\s\d{5}|\s[a-zA-z\.,\- ]*,\s*[A-Za-z]{2})?$'
 PRIORITY=-10
 COMMAND='PRIVMSG'
@@ -12,33 +12,35 @@ def PROCESS(bot, args, text):
 	zip=text[8:]
 	if not zip or zip=='': zip='Marquette, MI'
 	bot.log('Place: '+zip,'debug')
-	strings=_process(zip)
+	url=urllib.urlopen('http://www.google.com/ig/api?'+urllib.urlencode({'weather':zip}))
+	try:
+		strings=_process(url,zip)
+	except Exception as e:
+		raise e
+	finally: url.close()
 	for s in strings:
 		bot.mesg(s,args[1])
 	return False
-def _process(zip):
+def _process(url,zip):
 	str=[" "]
-	url=urllib.urlopen('http://www.google.com/ig/api?'+urllib.urlencode({'weather':zip}))
 	try:
-		doc=minidom.parse(url)
+		e=xml.etree.ElementTree.parse(url)
 	except:
 		return ['Google returned a malformed xml']
 	try:
-		e=doc.getElementsByTagName('problem_cause')[0].getAttribute('data')
-		return ["Google returned the following error: %s" % (e)]
+		return ["Google returned the following error: %s" % (e.find('/weather/problem_cause').attrib['data'])]
 	except: pass
-	info = doc.getElementsByTagName('forecast_information')[0]
-	str.append("%s" % info.getElementsByTagName('city')[0].getAttribute('data'))
-	day = doc.getElementsByTagName('current_conditions')[0]
-	fn=lambda x: day.getElementsByTagName(x)[0].getAttribute('data')
+	str.append("%s" % e.find('/weather/forecast_information/city').attrib['data'])
+	day = e.find('/weather/current_conditions')
+	fn=lambda x: day.find(x).attrib['data']
 	temp=int(fn('temp_f'))
 	hum=int(fn('humidity')[-4:-1])
 	str.append(u"Temperature:\u0003%02d%3d\u00B0F\u000F Humidity:\u0003%02d%3d%%" % (color_temp(temp), temp, color_hum(hum), hum))
 	wind=fn('wind_condition')
-	chill=getWindChill(int(re.search(r'(\d+)',wind).group(0)),temp)
+	chill=getWindChill(int(wind.split()[-2]),temp)
 	str.append(u" Wind Chill:\u0003%02d%3d\u00B0F\u000F     %s" % (color_temp(chill), chill, wind))
 	str.append("Current Conditions: %s" % fn('condition'))
-	for day in doc.getElementsByTagName('forecast_conditions'):
+	for day in e.findall('/weather/forecast_conditions'):
 		str.append(u"%s: %-18s \u000305%3s\u00B0F\u000F /\u000302%3s\u00B0F\u000F" % (fn('day_of_week'), fn('condition'), fn('high'), fn('low')))
 	str.append(" ")
 	return str

@@ -11,6 +11,7 @@ COMMAND='PRIVMSG'
 DIRECTED=3	#Can both be directed and not
 MINSIZE=60
 TINYURL='http://tinyurl.com/api-create.php?'
+USE_RSS=True
 RSS_FILEPATH=os.path.abspath('/home/cperry/pub/feed.xml')
 RSS_TITLE='CSC Link Dump'
 RSS_LINK='http://vr.nmu.edu/~cperry/'
@@ -31,10 +32,9 @@ def PROCESS(bot, args, text):
 		bot.log(e,'warning')
 	if len(title)>50: title=title[:47]+'...'
 	try:
-		sendToRSS(url,title,args[-1])
+		if USE_RSS: sendToRSS(url,title,args[-1])
 	except Exception as e:
-		bot.log("Error sending to rss feed: %s" % (e),'critical')
-		raise e
+		bot.log("Error sending to rss feed: %s" % (e),'error')
 	if len(url) < MINSIZE and (not text.startswith('tinyurl ')): return True
 	try:
 		returl=getTiny(url)

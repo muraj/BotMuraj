@@ -66,7 +66,7 @@ def PROCESS(bot, args, text):
 	except:
 		num=int(num.group(1).strip())
 	num=min(num,10)
-	for dumb in xrange(num):
+	for _ in xrange(num):
 		i=int((len(dancers)/3)*random.random())
 		str1+=dancers[i*3]+' '
 		str2+=dancers[i*3+1]+' '
