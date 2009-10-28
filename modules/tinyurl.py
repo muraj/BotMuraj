@@ -1,11 +1,11 @@
 """Listens for long URLs ( > 45 characters) and prints a shorter URL using tinyurl's api.  Usage: http://[url]/  or  PM the bot to send a link to a channel with the syntax: tinyurl #chan http://[url]/"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import urllib, re, socket, sys, htmllib, httplib, os.path
+import urllib, re, socket, sys, htmllib, httplib, os.path, codecs
 from xml.etree.ElementTree import ElementTree, dump, SubElement, Element	#ElementTree is my new best friend
 from time import localtime, strftime
 
-RULE=r'(?i).*\b(http:\/\/\S+).*'
+RULE=r'(?i).*(http:\/\/\S+).*'
 PRIORITY=0
 COMMAND='PRIVMSG'
 DIRECTED=3	#Can both be directed and not
@@ -22,14 +22,16 @@ class Opener(urllib.FancyURLopener):
 def PROCESS(bot, args, text):
 	global TINYURL
 	urllib._urlopener=Opener()	#Changes the user-agent to Mozilla
-	groups=re.search(r'\b(http:\/\/\S+)',text)
+	groups=re.search(r'(http:\/\/\S+)',text)
 	if not groups:
 		return True
-	else: url=groups.group(0)
+	else:	#Munge up the url to be correct
+		url=mungeUrl(groups.group(0))
 	try:
 		mime,title=getUrl(url)
 	except Exception as e:
 		bot.log(e,'warning')
+		title='N/A'
 	if len(title)>50: title=title[:47]+'...'
 	try:
 		if USE_RSS: sendToRSS(url,title,args[-1])
@@ -52,6 +54,19 @@ def PROCESS(bot, args, text):
 			return False
 	bot.mesg("Tiny: \x02\x1F%s\x0F \"%s\"" % (returl, title ), args[1])
 	return False
+def mungeUrl(url):
+	if type(url)!=unicode:	#Convert unicode bytes to full chars
+		url=unicode(url,'utf-8','replace')
+	for i,c in enumerate(url):	#Iterate over the CHARs and clip on control chars
+		if c < '\x09' or '\x0D'<c<'\x20' or c=='\x7F': break	#Found in mIRC formatting
+	else: i=len(url)	#No clipping!
+	url=url[:i]		#Clip
+	spliturl=url.split('/')
+	spliturl[2]=spliturl[2].encode('idna')	#convert domain to idna format
+	if len(spliturl) > 3:	#clean up the path of unicode
+		for i,s in enumerate(spliturl[3:]):
+			spliturl[i+3]=urllib.quote(s.encode('utf-8'),'?&=')
+	return '/'.join(spliturl)	#Join them back up!
 def getUrl(url):
 	"""Returns the (MIME, title) of a url where title is the <title>[content]</title> in html"""
 	title, mime="N/A", "N/A"
@@ -61,9 +76,9 @@ def getUrl(url):
 		mime = f.info().subtype
 		if not mime == 'html': return mime, title
 		html=f.read(8096)	#Should grab most titles
-		group=re.search(r'(?i)(?:\<title\>)(.*)(?:\<\/title\>)',html, re.DOTALL)
+		group=re.search(r'(?i)\<title\>(.*?)\<\/title\>',html, re.DOTALL)
 		if not group: return mime, title
-		title=unicode(group.group(1),'utf-8')
+		title=unicode(group.group(1),'utf-8', 'replace')
 		for k, v in htmllib.HTMLParser.entitydefs.iteritems():
 			if not v.startswith('&#'):
 				title=title.replace('&%s;' % k,unicode(v,'latin-1'))
@@ -120,7 +135,7 @@ def sendToRSS(url, title, poster):
 		if it.find('guid').text == url:
 			it.find('pubDate').text=strftime(RSS_DATEFORMAT,localtime())
 			chan.remove(it)		#Keep in sorted order
-			chan.insert(5,it)
+			chan.insert(4,it)
 			break
 		elif i>RSS_MAX: r.append(it)
 	else:
@@ -130,11 +145,12 @@ def sendToRSS(url, title, poster):
 		SubElement(it,'link').text=url
 		SubElement(it,'pubDate').text=strftime(RSS_DATEFORMAT,localtime())
 		SubElement(it,'guid').text=url
-		chan.insert(5,it)
-	f=open(RSS_FILEPATH,'r+')
+		chan.insert(4,it)
+	f=codecs.open(RSS_FILEPATH,'r+','utf-8')
 	f.write("""<?xml version="1.0" encoding="utf-8" ?>
 <?xml-stylesheet type="text/css" title="CSS_formating" href="rss.css" ?>
 <?xml-stylesheet type="text/xsl" href="rss.xsl" ?>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 """)
 	e.write(f)
+	f.close()

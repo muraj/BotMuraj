@@ -133,14 +133,35 @@ class Bot(asynchat.async_chat):
 if __name__=='__main__':
 	import optparse
 	parser = optparse.OptionParser()
-	parser.add_option('-l','--logging-level',help='Set logging level: one of \'critical\', \'error\', \'warning\', \'info\', \'debug\'',metavar="MODE")
+	parser.add_option('-l','--logging-level',help='Set logging level: one of \'critical\', \'error\', \'warning\', \'info\', \'debug\'',metavar="MODE",default='error')
 	parser.add_option('-f','--logging-file',help='Log to FILE',metavar="FILE")
+	parser.add_option('-d','--daemon',help='Start as daemon',action='store_true',default=False,dest='daemon')
 	(options, args) = parser.parse_args()
 	ll={'critical': logging.CRITICAL,
 		'error': logging.ERROR,
 		'warning': logging.WARNING,
 		'info':	logging.INFO,
 		'debug': logging.DEBUG }.get(options.logging_level,logging.NOTSET)
-	bot=Bot(NICK, CHAN, MASTER, log=options.logging_file, log_level=ll)
-	bot.connectServer(SERVER, PORT)
-	bot.run()
+	if options.daemon:
+		import resource
+		max=resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+		if max == resource.RLIM_INFINITY: max=1024
+		try:	# backgrounds the process
+			pid=os.fork()
+		except Exception as e:
+			raise e
+		if pid!=0: os._exit(0)	#Parent Exits
+		os.setsid() #Child1 is the session leader
+		try:
+			pid=os.fork()	#Prevents session leader
+		except Exception as e:
+			raise e
+		if pid!=0: os._exit(0)	#Child1 exits
+		os.nice(40)	#Lower priority.
+		bot=Bot(NICK, CHAN, MASTER, log=options.logging_file, log_level=ll)
+		bot.connectServer(SERVER, PORT)
+		bot.run()
+	else:
+		bot=Bot(NICK, CHAN, MASTER, log=options.logging_file, log_level=ll)
+		bot.connectServer(SERVER, PORT)
+		bot.run()
