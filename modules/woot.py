@@ -6,7 +6,8 @@ RULE=r'^(([A-Za-z0-9]+\.)?woot).*'
 PRIORITY=10
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed to the bot
-TINYURL=True
+DOTINYURL=True
+TINYURL='http://tinyurl.com/api-create.php?'
 def PROCESS(bot, args, text):
 	woot=re.search(r'^(([A-Za-z0-9]+\.)?woot).*',text).group(1)
 	f=urllib.urlopen('http://%s.com/salerss.aspx' % (woot))
@@ -27,6 +28,11 @@ def PROCESS(bot, args, text):
 	bot.mesg(u"%s \"%s\" %s: %s %s" % (price, product, percent, wootoff, url), args[1])
 	f.close()
 	return False
+def INIT(bot):
+	global DOTINYURL, TINYURL
+	if not bot.config.has_section('woot'): return
+	DOTINYURL = bot.config.getboolean('woot','usetinyurl')
+	TINYURL = bot.config.get('woot','tinyurl') if DOTINYURL else None
 def getTiny(url):
 	"""Returns the TinyURL version of <url>"""
 	TINYURL,tinyurl='http://tinyurl.com/api-create.php?','N/A'

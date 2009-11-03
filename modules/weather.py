@@ -4,24 +4,24 @@
 import urllib
 #from xml.dom import minidom
 import xml.etree.ElementTree
-RULE=r'^weather(\s\d{5}|\s[a-zA-z\.,\- ]*,\s*[A-Za-z]{2})?$'
+RULE=r'^weather|forecast(\s\d{5}|\s[a-zA-z\.,\- ]*,\s*[A-Za-z]{2})?$'
+HOME='Marquette, MI'
 PRIORITY=-10
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed at
 def PROCESS(bot, args, text):
 	zip=text[8:]
-	if not zip or zip=='': zip='Marquette, MI'
-	bot.log('Place: '+zip,'debug')
+	if not zip or zip=='': zip=HOME
 	url=urllib.urlopen('http://www.google.com/ig/api?'+urllib.urlencode({'weather':zip}))
 	try:
-		strings=_process(url,zip)
+		strings=_process(url,zip,text.startswith('forecast'))
 	except Exception as e:
 		raise e
 	finally: url.close()
 	for s in strings:
 		bot.mesg(s,args[1])
 	return False
-def _process(url,zip):
+def _process(url,zip,forecast=True):
 	str=[" "]
 	try:
 		e=xml.etree.ElementTree.parse(url)
@@ -40,10 +40,15 @@ def _process(url,zip):
 	chill=getWindChill(int(wind.split()[-2]),temp)
 	str.append(u" Wind Chill:\u0003%02d%3d\u00B0F\u000F     %s" % (color_temp(chill), chill, wind))
 	str.append("Current Conditions: %s" % fn('condition'))
+	if not forecast: return str+[' ']	#Skip out
 	for day in e.findall('/weather/forecast_conditions'):
 		str.append(u"%s: %-18s \u000305%3s\u00B0F\u000F /\u000302%3s\u00B0F\u000F" % (fn('day_of_week'), fn('condition'), fn('high'), fn('low')))
 	str.append(" ")
 	return str
+def INIT(bot):
+	global HOME
+	if bot.config.has_section('weather'):
+		HOME=bot.config.get('weather','home')
 def getWindChill(V, T):	#V=wind_speed, T=air_temp
 	"""From the NWS website"""
 	if V>5: return 35.74+0.6215*T-35.75*(V**0.16)+0.4275*T*(V**0.16)

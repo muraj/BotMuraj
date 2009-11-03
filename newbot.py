@@ -1,24 +1,26 @@
 """Config Constants"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-SERVER	=	'csc.nmu.edu'
-PORT	=	6667
-NICK	=	'BotMuraj'
-CHAN	=	['#test']
-MASTER	=	'muraj'
 
-import socket, asyncore, asynchat, sys, re, imp, glob, os, traceback, logging
+import socket, asyncore, asynchat, sys, re, imp, glob, os
+import traceback, logging, ConfigParser
 class Bot(asynchat.async_chat):
-	def __init__(self, nick, chs, master, log=None, log_level=None):
-		self.nick=nick
-		self.master=master
+	def __init__(self, config_file):
+		self.config = config_file
+		self.nick = self.config.get('main','nick')
+		self.master = self.config.get('main','master')
 		asynchat.async_chat.__init__(self)
 		self.set_terminator('\r\n')
 		self.buffer=''
 		self.origin=re.compile(r'([^!]*)!?([^@]*)@?(.*)')
-		self.chans=[chan for chan in chs]
-		if not log == None:
-			logging.basicConfig(level=log_level, filename=log, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+		self.chans= self.config.get('main','channels').split(',')
+		if self.config.has_option('main','logging') and self.config.getboolean('main','logging'):
+			ll={'critical': logging.CRITICAL,
+				'error': logging.ERROR,
+				'warning': logging.WARNING,
+				'info':	logging.INFO,
+				'debug': logging.DEBUG }.get(self.config.get('main','loglevel'),logging.NOTSET)
+			logging.basicConfig(level=ll, filename=self.config.get('main','logfile'), format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 		os.chdir(os.path.split(os.path.abspath(__file__))[0])	#Keeping everything relative to the root directory structure
 		self.mods={}
 		paths=glob.glob('./modules/*.py')
@@ -133,15 +135,11 @@ class Bot(asynchat.async_chat):
 if __name__=='__main__':
 	import optparse
 	parser = optparse.OptionParser()
-	parser.add_option('-l','--logging-level',help='Set logging level: one of \'critical\', \'error\', \'warning\', \'info\', \'debug\'',metavar="MODE",default='error')
-	parser.add_option('-f','--logging-file',help='Log to FILE',metavar="FILE")
 	parser.add_option('-d','--daemon',help='Start as daemon',action='store_true',default=False,dest='daemon')
+	parser.add_option('-c','--config-file',help='Use specified config file (default is ./config)', metavar='FILE', default='./config')
 	(options, args) = parser.parse_args()
-	ll={'critical': logging.CRITICAL,
-		'error': logging.ERROR,
-		'warning': logging.WARNING,
-		'info':	logging.INFO,
-		'debug': logging.DEBUG }.get(options.logging_level,logging.NOTSET)
+	config = ConfigParser.SafeConfigParser()
+	config.read(options.config_file)
 	if options.daemon:
 		import resource
 		max=resource.getrlimit(resource.RLIMIT_NOFILE)[1]
@@ -158,10 +156,10 @@ if __name__=='__main__':
 			raise e
 		if pid!=0: os._exit(0)	#Child1 exits
 		os.nice(40)	#Lower priority.
-		bot=Bot(NICK, CHAN, MASTER, log=options.logging_file, log_level=ll)
-		bot.connectServer(SERVER, PORT)
+		bot=Bot(config_file=config)
+		bot.connectServer(config.get('main','server'), config.getint('main','port'))
 		bot.run()
 	else:
-		bot=Bot(NICK, CHAN, MASTER, log=options.logging_file, log_level=ll)
-		bot.connectServer(SERVER, PORT)
+		bot=Bot(config_file=config)
+		bot.connectServer(config.get('main','server'), config.getint('main','port'))
 		bot.run()

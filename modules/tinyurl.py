@@ -11,10 +11,10 @@ COMMAND='PRIVMSG'
 DIRECTED=3	#Can both be directed and not
 MINSIZE=60
 TINYURL='http://tinyurl.com/api-create.php?'
-USE_RSS=True
-RSS_FILEPATH=os.path.abspath('/home/cperry/pub/feed.xml')
+USE_RSS=False
+RSS_FILEPATH=os.path.abspath('./feed.xml')
 RSS_TITLE='CSC Link Dump'
-RSS_LINK='http://vr.nmu.edu/~cperry/'
+RSS_LINK='http://localhost/'
 RSS_DATEFORMAT='%a, %d %b %Y %T %z'
 RSS_MAX=5
 class Opener(urllib.FancyURLopener):
@@ -33,10 +33,13 @@ def PROCESS(bot, args, text):
 		bot.log(e,'warning')
 		title='N/A'
 	if len(title)>50: title=title[:47]+'...'
+	bot.log('About to send to rss')
 	try:
-		if USE_RSS: sendToRSS(url,title,args[-1])
+		if USE_RSS:
+			sendToRSS(url,title,args[-1])
 	except Exception as e:
 		bot.log("Error sending to rss feed: %s" % (e),'error')
+	bot.log('done sending to rss')
 	if len(url) < MINSIZE and (not text.startswith('tinyurl ')): return True
 	try:
 		returl=getTiny(url)
@@ -54,6 +57,17 @@ def PROCESS(bot, args, text):
 			return False
 	bot.mesg("Tiny: \x02\x1F%s\x0F \"%s\"" % (returl, title ), args[1])
 	return False
+def INIT(bot):	#Config setup!
+	global USE_RSS, RSS_FILEPATH, TINYURL, RSS_TITLE, RSS_LINK, RSS_MAX, MINSIZE
+	if not bot.config.has_section('tinyurl'): return
+	USE_RSS = bot.config.getboolean('tinyurl','userss')
+	RSS_FILEPATH = os.path.abspath(bot.config.get('tinyurl','rssfilepath'))
+	TINYURL = bot.config.get('tinyurl','tinyurl')
+	RSS_TITLE = bot.config.get('tinyurl','rsstitle')
+	RSS_LINK = bot.config.get('tinyurl','rsslink')
+	RSS_MAX = bot.config.getint('tinyurl','rssmax')
+	MINSIZE = bot.config.getint('tinyurl','mintitlesize')
+	bot.log(','.join([str(USE_RSS),RSS_FILEPATH,TINYURL,RSS_TITLE,RSS_LINK,str(RSS_MAX),str(MINSIZE)]))
 def mungeUrl(url):
 	if type(url)!=unicode:	#Convert unicode bytes to full chars
 		url=unicode(url,'utf-8','replace')

@@ -30,3 +30,7 @@ def PROCESS(bot, args, text):
 		shaft+='D'
 		bot.mesg(shaft, args[1])
 	return False
+def INIT(bot):
+	global SCALE
+	if bot.config.has_section('epenis'):
+		SCALE=bot.config.getfloat('epenis','scale')
