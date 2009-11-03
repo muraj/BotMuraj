@@ -17,7 +17,7 @@ mintitlesize = 60
 tinyurl = http://tinyurl.com/api-create.php?
 userss = true
 rssfilepath = /home/cperry/pub/feed.xml
-rsstitle = CSC Link Dump	
+rsstitle = CSC Link Dump
 rsslink = http://vr.nmu.edu/~cperry/
 rssmax = 5
 
