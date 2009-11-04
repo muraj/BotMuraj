@@ -1,4 +1,4 @@
-"""Dancing Bots!  OMG! Try parameters 'once' 'twice' 'thrice' or a number < 10"""
+"""Dancing Bots! Try parameters 'once' 'twice' 'thrice' or a number <= 10"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re

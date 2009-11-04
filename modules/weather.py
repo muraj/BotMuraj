@@ -1,4 +1,4 @@
-"""Displays the weather using the following syntax: 'weather [zipcode|city, state]'"""
+"""Displays the weather using the following syntax: 'forecast|weather [zipcode|city, state]'"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import urllib

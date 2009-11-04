@@ -1,4 +1,4 @@
-"""An intelligent catch-all for conversation. Uses PyAIML module for most of the work. Each channel has it's own session, including PM's. For more information, see \"A.L.I.C.E\""""
+"""An intelligent catch-all for conversation. Uses PyAIML module for most of the work. Each channel has it's own session, including PM's. For more information, google \"A.L.I.C.E\""""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import aiml.Kernel

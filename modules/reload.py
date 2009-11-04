@@ -8,7 +8,7 @@ PRIORITY=-9999
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed to the bot
 def PROCESS(bot, args, text):
-	if bot.master != args[-1]:
+	if bot.master != args[-2]:
 		bot.mesg('No, you can\'t tell me what to do.',args[1])
 		return False
 	else: bot.mesg('Anything for you!',args[1])

@@ -2,34 +2,61 @@
 server = csc.nmu.edu
 port = 6667
 nick = BotMuraj
+
+;Comma seperated list of channels to join
 channels = #test
+
+;Bot master.  Only the master can reload modules
 master = muraj
+
+;Not implemented, sets the user agent for urllib
 useragent = Mozilla/5.0
+
 logging = true
 logfile = log.txt
+
+;Log Level can be (in order of severity):
+;critical, error, warning, info, debug
 loglevel = debug
 
 [epenis]
+;Number of segments per second
+;default is 80 segments/year
 scale = 2.53510117e-6
 
 [tinyurl]
+;Maximum length of title
 mintitlesize = 60
+
+;Url to get tinyurl from.
 tinyurl = http://tinyurl.com/api-create.php?
+
+;Dump links to rss?
 userss = true
+
+;Path to rss file
 rssfilepath = /home/cperry/pub/feed.xml
+
+;Title of rss
 rsstitle = CSC Link Dump
+
+;Link for rss
 rsslink = http://vr.nmu.edu/~cperry/
+
+;Max number of links allowed
 rssmax = 5
 
 [weather]
+;Default location to pull weather info from
 home = Marquette, MI
 
-[woot]
-usetinyurl = true
-tinyurl = http://tinyurl.com/api-create.php?
-
 [aimltalk]
+;* All config variables in this section are added as botpredicates to
+;* aimlpy and can be used in the aimlscripts
+
+;Needed to run python learning scripts
 PYTHONPATH = /usr/bin
+
 botmaster = master
 genus = robot
 location = Marquette, MI

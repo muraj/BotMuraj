@@ -1,4 +1,4 @@
-"""Joins an irc channel given the following syntax: 'join #chan' """
+"""Joins an irc channel given the following syntax: 'join #chan'."""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re

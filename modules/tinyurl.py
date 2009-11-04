@@ -1,4 +1,4 @@
-"""Listens for long URLs ( > 45 characters) and prints a shorter URL using tinyurl's api.  Usage: http://[url]/  or  PM the bot to send a link to a channel with the syntax: tinyurl #chan http://[url]/"""
+"""Listens for long URLs and prints a shorter URL using tinyurl's api and acts as a link dump to an rss file.  Usage: http://[url] or PM the bot to send a link to a channel with the syntax: tinyurl #chan http://[url]"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import urllib, re, socket, sys, htmllib, httplib, os.path, codecs
@@ -33,13 +33,10 @@ def PROCESS(bot, args, text):
 		bot.log(e,'warning')
 		title='N/A'
 	if len(title)>50: title=title[:47]+'...'
-	bot.log('About to send to rss')
 	try:
-		if USE_RSS:
-			sendToRSS(url,title,args[-1])
+		if USE_RSS: sendToRSS(url,title,args[-1])
 	except Exception as e:
 		bot.log("Error sending to rss feed: %s" % (e),'error')
-	bot.log('done sending to rss')
 	if len(url) < MINSIZE and (not text.startswith('tinyurl ')): return True
 	try:
 		returl=getTiny(url)
@@ -67,7 +64,6 @@ def INIT(bot):	#Config setup!
 	RSS_LINK = bot.config.get('tinyurl','rsslink')
 	RSS_MAX = bot.config.getint('tinyurl','rssmax')
 	MINSIZE = bot.config.getint('tinyurl','mintitlesize')
-	bot.log(','.join([str(USE_RSS),RSS_FILEPATH,TINYURL,RSS_TITLE,RSS_LINK,str(RSS_MAX),str(MINSIZE)]))
 def mungeUrl(url):
 	if type(url)!=unicode:	#Convert unicode bytes to full chars
 		url=unicode(url,'utf-8','replace')
@@ -160,7 +156,7 @@ def sendToRSS(url, title, poster):
 		SubElement(it,'pubDate').text=strftime(RSS_DATEFORMAT,localtime())
 		SubElement(it,'guid').text=url
 		chan.insert(4,it)
-	f=codecs.open(RSS_FILEPATH,'r+','utf-8')
+	f=codecs.open(RSS_FILEPATH,'w+','utf-8')
 	f.write("""<?xml version="1.0" encoding="utf-8" ?>
 <?xml-stylesheet type="text/css" title="CSS_formating" href="rss.css" ?>
 <?xml-stylesheet type="text/xsl" href="rss.xsl" ?>

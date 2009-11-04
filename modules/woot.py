@@ -1,4 +1,4 @@
-"""Pulls information off a woot subsite's rss, providing the price, product, percent to sellout, and link to buy"""
+"""Pulls information off a woot subsites' rss, providing the price, product, percent to sellout, and link to product"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import urllib, xml.etree.ElementTree, re
