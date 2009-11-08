@@ -79,14 +79,15 @@ def mungeUrl(url):
 	return '/'.join(spliturl)	#Join them back up!
 def getUrl(url):
 	"""Returns the (MIME, title) of a url where title is the <title>[content]</title> in html"""
-	title, mime="N/A", 'application/octet-stream'
+	title, mime='N/A', 'application/octet-stream'
 	socket.setdefaulttimeout(3)
 	try:
 		f=urllib.urlopen(url)
 		mime = f.info().type
 		length = f.info().get('Content-Length')
 		if length == None: length=1	#Safe to assume that the minimum is always at least a byte
-		if not mime.lower() == 'text/html': return (mime, length), title
+		if not mime.lower() == 'text/html':
+			return (mime, length), url.split('/')[-1]
 		html=f.read(8096)	#Should grab most titles
 		group=re.search(r'(?i)\<title\>(.*?)\<\/title\>',html, re.DOTALL)
 		if not group: return (mime, length), title
@@ -150,7 +151,7 @@ def sendToRSS(info, url, title, poster):
 			chan.remove(it)		#Keep in sorted order
 			chan.insert(4,it)
 			break
-		elif i>RSS_MAX: r.append(it)
+		elif i+1>=RSS_MAX: r.append(it)
 	else:
 		for it in r: chan.remove(it)
 		it=Element('item')

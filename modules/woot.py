@@ -6,23 +6,22 @@ RULE=r'^(([A-Za-z0-9]+\.)?woot).*'
 PRIORITY=10
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed to the bot
-DOTINYURL=True
-TINYURL='http://tinyurl.com/api-create.php?'
 def PROCESS(bot, args, text):
 	woot=re.search(r'^(([A-Za-z0-9]+\.)?woot).*',text).group(1)
 	f=urllib.urlopen('http://%s.com/salerss.aspx' % (woot))
 	e=xml.etree.ElementTree.parse(f)
 	price=e.findtext('/channel/item/{http://www.woot.com/}price')
-	product=e.findtext('/channel/item/{http://www.woot.com/}products/{http://www.woot.com/}product')
-	if len(product)>50: product=product[:47]+'...'
+	condition=e.findtext('/channel/item/{http://www.woot.com/}condition')
+	product=e.findtext('/channel/item/title')
+	if condition.lower() != 'new': product=condition+' '+product
 	percent=e.findtext('/channel/item/{http://www.woot.com/}soldout')
 	wootoff=e.findtext('/channel/item/{http://www.woot.com/}wootoff')
 	wootoff='' if wootoff=='False' else 'WootOff! '
 	if percent == 'False':
 		percent=100*float(e.findtext('channel/item/{http://www.woot.com/}soldoutpercentage'))
-		percent="%.2f%%" % (percent)
-	else: percent='SOLD OUT'
+		percent="%.2f%% sold" % (percent)
+	else: percent='\x0300,05SOLD OUT\x0F'
 	url="http://%s.com/" % woot
-	bot.mesg(u"%s \"%s\" %s sold: %s%s" % (price, product, percent, wootoff, url), args[1])
+	bot.mesg(u"%s \x02%s\x0F %s: %s%s" % (price, product, percent, wootoff, url), args[1])
 	f.close()
 	return False
