@@ -28,13 +28,13 @@ def PROCESS(bot, args, text):
 	else:	#Munge up the url to be correct
 		url=mungeUrl(groups.group(0))
 	try:
-		mime,title=getUrl(url)
+		info,title=getUrl(url)
 	except Exception as e:
 		bot.log(e,'warning')
 		title='N/A'
 	if len(title)>50: title=title[:47]+'...'
 	try:
-		if USE_RSS: sendToRSS(url,title,args[-1])
+		if USE_RSS: sendToRSS(info,url,title,args[-1])
 	except Exception as e:
 		bot.log("Error sending to rss feed: %s" % (e),'error')
 	if len(url) < MINSIZE and (not text.startswith('tinyurl ')): return True
@@ -79,15 +79,17 @@ def mungeUrl(url):
 	return '/'.join(spliturl)	#Join them back up!
 def getUrl(url):
 	"""Returns the (MIME, title) of a url where title is the <title>[content]</title> in html"""
-	title, mime="N/A", "N/A"
+	title, mime="N/A", 'application/octet-stream'
 	socket.setdefaulttimeout(3)
 	try:
 		f=urllib.urlopen(url)
-		mime = f.info().subtype
-		if not mime == 'html': return mime, title
+		mime = f.info().type
+		length = f.info().get('Content-Length')
+		if length == None: length=1	#Safe to assume that the minimum is always at least a byte
+		if not mime.lower() == 'text/html': return (mime, length), title
 		html=f.read(8096)	#Should grab most titles
 		group=re.search(r'(?i)\<title\>(.*?)\<\/title\>',html, re.DOTALL)
-		if not group: return mime, title
+		if not group: return (mime, length), title
 		title=unicode(group.group(1),'utf-8', 'replace')
 		for k, v in htmllib.HTMLParser.entitydefs.iteritems():
 			if not v.startswith('&#'):
@@ -100,7 +102,7 @@ def getUrl(url):
 	finally:
 		f.close()
 		socket.setdefaulttimeout(10)
-	return mime, title
+	return (mime, length), title
 def getTiny(url):
 	"""Returns the TinyURL version of <url>"""
 	tinyurl="N/A"
@@ -127,13 +129,14 @@ def setupFeed():
 <link>%s</link>
 <description>blah</description>
 <language>en-us</language>
+<ns0:link rel="self" xmlns:ns0="http://www.w3.org/2005/Atom" href="%s" type="application/rss+xml" />
 </channel>
 </rss>
-""" % (RSS_TITLE,link)
+""" % (RSS_TITLE,link,link)
 	f=open(RSS_FILEPATH,'w')
 	f.write(template)
 	f.close()
-def sendToRSS(url, title, poster):
+def sendToRSS(info, url, title, poster):
 	"""Appends the url to the rss feed"""
 	if url == RSS_LINK+os.path.split(RSS_FILEPATH)[1]: return
 	if not os.path.exists(RSS_FILEPATH): setupFeed()
@@ -155,7 +158,12 @@ def sendToRSS(url, title, poster):
 		SubElement(it,'link').text=url
 		SubElement(it,'pubDate').text=strftime(RSS_DATEFORMAT,localtime())
 		SubElement(it,'guid').text=url
-		chan.insert(4,it)
+		if info[0] != 'text/html':
+			enc=SubElement(it,'enclosure')
+			enc.set('url',url)
+			enc.set('type',info[0])
+			enc.set('length',info[1])
+		chan.insert(5,it)	#4 in order to bypass all the <title> and other tags
 	f=codecs.open(RSS_FILEPATH,'w+','utf-8')
 	f.write("""<?xml version="1.0" encoding="utf-8" ?>
 <?xml-stylesheet type="text/css" title="CSS_formating" href="rss.css" ?>

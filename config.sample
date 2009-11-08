@@ -7,7 +7,8 @@ nick = BotMuraj
 channels = #test
 
 ;Bot master.  Only the master can reload modules
-master = muraj
+;Based on login name, not nick
+master = cperry
 
 ;Not implemented, sets the user agent for urllib
 useragent = Mozilla/5.0
