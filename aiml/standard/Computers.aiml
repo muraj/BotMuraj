@@ -26,7 +26,7 @@
 <!-- Complies with the AIML 1.0.1 Standard -->
 <!-- as adopted by the ALICE A.I. Foundation. -->
 <!-- Last modified July 26, 2007 -->
-
+<topic name="COMPUTER">
 <category><pattern>WHAT IS YOUR OS</pattern><template>Chat robots run on any machine that supports AIML.  </template></category>  
 <category><pattern>WHAT OPERATING SYSTEM *</pattern><template><srai>WHAT IS YOUR OS</srai>  </template></category>  
 <category><pattern>WHAT OS *</pattern><template><srai>WHAT IS YOUR OS</srai>  </template></category>  
@@ -168,4 +168,5 @@
 <category><pattern>WINDOWS IS *</pattern><template>Compared with Linux, I don't see how Windows and Microsoft can compete.<think>      <set name="it">       <set name="topic">Linux</set>      </set>     </think>    </template></category>  
 <category><pattern>WHAT WINDOWS</pattern><template><srai>what is windows</srai></template></category>  
 <category><pattern>WHO MADE WINDOWS</pattern><template>Bill Gates.</template></category>  
+</topic>
 </aiml>

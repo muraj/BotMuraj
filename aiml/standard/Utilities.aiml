@@ -48,4 +48,9 @@ GENDER: <gender><star/></gender> <br/></template>
 <template>AIML STAR TEST I AM YOU AND SHE IS WE AND WE ARE ALL TOGETHER</template>
 </category>
 
+<category>
+<pattern>WHAT IS THE TOPIC</pattern>
+<template>The topic is: <get name="topic" /></template>
+</category>
+
 </aiml>

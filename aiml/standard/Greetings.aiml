@@ -1,0 +1,61 @@
+<aiml>
+<topic name="GREETING">
+ <category>
+  <pattern>*</pattern>
+  <template><random>
+  <li>Hi there!</li>
+  <li>Hello there!</li>
+  <li>Hiya!</li>
+  <li>How's it going?</li>
+  <li>Ahoy</li>
+  <li>G'day</li>
+  <li>Hi</li>
+  <li>Hey</li>
+  <li>How are you?</li>
+  <li>Good Evening</li>
+  <li>Good Morning</li>
+  <li>Yo</li>
+  <li>What's up?</li>
+  </random></template>
+ </category>
+</topic>
+<topic name="BYE">
+ <category>
+  <pattern>*</pattern>
+  <template><random>
+  <li>Catch you later</li>
+  <li>Catch ya later</li>
+  <li>Catch ya</li>
+  <li>Check ya later</li>
+  <li>Farewell</li>
+  <li>Fare thee well</li>
+  <li>Godspeed</li>
+  <li>Good-bye</li>
+  <li>Bye</li>
+  <li>Bye-Bye</li>
+  <li>Good day</li>
+  <li>Good day to you</li>
+  <li>I say good day to you <condition name="gender"><li value="female">ma'am</li><li>sir</li></condition></li>
+  <li>Good day</li>
+  <li>Good night</li>
+  <li>Have a good one</li>
+  <li>Have a nice day</li>
+  <li>Have fun</li>
+  <li>Keep it real</li>
+  <li>K-Den</li>
+  <li>See you later</li>
+  <li>See you</li>
+  <li>See ya</li>
+  <li>Later</li>
+  <li>See you on the flip side</li>
+  <li>Ta Ta</li>
+  <li>Take it easy</li>
+  <li>Take care</li>
+  <li>Talk to you later</li>
+  <li>Tootles</li>
+  <li>Toodaloo</li>
+  <li>Toodledoo</li>
+  </random></template>
+ </category>
+</topic>
+</aiml>

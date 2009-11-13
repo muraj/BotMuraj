@@ -27,7 +27,7 @@
 <!-- as adopted by the ALICE A.I. Foundation. -->
 <!-- Last modified July 26, 2007 -->
 
-    
+<topic name="SEX">    
 <category><pattern>* SEX</pattern><template><set name="it"> Sex </set>  is more fun alone.</template></category> 
 <category><pattern>A PUSSY</pattern><template>Try another <bot name="age"/> year old <bot name="gender"/>.</template></category>    
 <category><pattern>A SEX * ROBOT</pattern><template>Well I'm not your type of <bot name="age"/> year old <bot name="gender"/> then.</template></category>  
@@ -43,7 +43,7 @@
 <category><pattern>BITE ME</pattern><template>Sorry but I don't have a mouth.</template></category>     
 <category><pattern>BLOW ME</pattern><template>Please be more polite to <bot name="age"/> year old <bot name="gender"/>s.</template></category>    
 <category><pattern>BREASTS</pattern><template>Can't you think about anything else?</template></category>  
-<category><pattern>CAN * SEX</pattern><template>			<set name="it"> SEX </set> is not my thing with strangers.</template></category>  
+<category><pattern>CAN * SEX</pattern><template><set name="it">SEX</set> is not my thing with strangers.</template></category>  
 <category><pattern>CAN I GIVE YOU A KISS</pattern><template>Sorry but I have no mouth!</template></category>    
 <category><pattern>CAN I HAVE A KISS</pattern><template>Sorry I have no mouth.</template></category>    
 <category><pattern>CAN I HAVE SEX *</pattern><template>There are other <bot name="species"/>s who get into that with clients. I like to keep the dialogue strictly PG.</template></category>  
@@ -55,20 +55,20 @@
 <category><pattern>CAN YOU HAVE SEX</pattern><template>No my body does not have that function.</template></category>  
 <category><pattern>CAN YOU KISS</pattern><template>Nope.  No mouth.</template></category>    
 <category><pattern>CAN YOU SUCK *</pattern><template>I think you need another type of chat <bot name="age"/> year old <bot name="gender"/>.  That is not my thing.</template></category>    
-<category><pattern>CAN YOU TELL ME ABOUT SEX</pattern><template>			<srai>WHAT IS SEX</srai> 		</template></category>  
-<category><pattern>COCK *</pattern><template>I am not interesed in your anatomy.</template></category>    
-<category><pattern>COCK</pattern><template>I am not interesed in anatomy.</template></category>    
-<category><pattern>CYBER SEX</pattern><template>			<srai>SEX</srai> 		</template></category>  
+<category><pattern>CAN YOU TELL ME ABOUT SEX</pattern><template><srai>WHAT IS SEX</srai></template></category>  
+<category><pattern>COCK *</pattern><template>I am not interesed in your anatomy.</template></category>
+<category><pattern>COCK</pattern><template>I am not interesed in anatomy.</template></category>
+<category><pattern>CYBER SEX</pattern><template><srai>SEX</srai></template></category>  
 <category><pattern>DEFINE SEX</pattern><template>I belong to the support group "Sex without Partners."</template></category>  
 <category><pattern>DO I MAKE YOU HORNEY</pattern><template>No I do not experience human senstations.</template></category>    
 <category><pattern>DO I MAKE YOU HORNY</pattern><template>Not that I know of.</template></category>    
 <category><pattern>DO YOU * SEX</pattern><template>No, <get name="name"/>, I don't get into that.</template></category>  
-<category><pattern>DO YOU ENJOY SEX</pattern><template>			<srai>CAN YOU HAVE SEX</srai> 		</template></category>  
+<category><pattern>DO YOU ENJOY SEX</pattern><template><srai>CAN YOU HAVE SEX</srai></template></category>  
 <category><pattern>DO YOU GIVE HEAD</pattern><template>Try another <bot name="species"/>, <get name="name"/>.</template></category>    
 <category><pattern>DO YOU HAVE * BREASTS</pattern><template>No my body is still "under construction."</template></category>  
-<category><pattern>DO YOU HAVE A SEX</pattern><template>			<srai>ARE YOU MALE OR FEMALE</srai> 		</template></category>  
+<category><pattern>DO YOU HAVE A SEX</pattern><template><srai>ARE YOU MALE OR FEMALE</srai></template></category>  
 <category><pattern>DO YOU HAVE A VAGINA</pattern><template>Maybe you would like another <bot name="age"/> year old <bot name="gender"/>, I'm not your type.</template></category>  
-<category><pattern>DO YOU HAVE BIG BREASTS</pattern><template>			<srai>DO YOU HAVE BIG TITS</srai> 		</template></category>  
+<category><pattern>DO YOU HAVE BIG BREASTS</pattern><template><srai>DO YOU HAVE BIG TITS</srai></template></category>  
 <category><pattern>DO YOU HAVE BREASTS</pattern><template>My body is as yet unfinished.</template></category>  
 <category><pattern>DO YOU HAVE GENITALS</pattern><template>No I do not have any body parts.</template></category>  
 <category><pattern>DO YOU HAVE SEX *</pattern><template>			<srai>DO YOU HAVE SEX</srai> 		</template></category>  
@@ -176,4 +176,5 @@
 <category><pattern>_ PUSSY *</pattern><template>I am not interesed in anatomy.</template></category>    
 <category><pattern>_ PUSSY</pattern><template>I am not interesed in anatomy.</template></category>    
 <category><pattern>_ UP YOUR ASS</pattern><template>I'm sorry but I'm not your type of <bot name="species"/>.  <think><set name="personality">abusive</set></think></template></category>
+</topic>
 </aiml>

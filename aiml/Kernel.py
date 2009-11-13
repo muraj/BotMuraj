@@ -109,7 +109,7 @@ class Kernel:
         try: learns = [ learnFiles + "" ]
         except: pass
         for file in learns:
-            self.learn(file)
+            self.learnFiles(file)
             
         # ditto for commands
         cmds = commands
@@ -270,32 +270,34 @@ class Kernel:
         else:
             s = self._sessions
         return copy.deepcopy(s)
-
-    def learn(self, filename):
+    def learnFiles(self,globber):
         """Load and learn the contents of the specified AIML file.
-
+        
         If filename includes wildcard characters, all matching files
         will be loaded and learned.
 
         """
-        for f in glob.glob(filename):
-            if self._verboseMode: print "Loading %s..." % f,
-            start = time.clock()
-            # Load and parse the AIML file.
-            parser = AimlParser.create_parser()
-            handler = parser.getContentHandler()
-            handler.setEncoding(self._textEncoding)
-            try: parser.parse(f)
-            except xml.sax.SAXParseException, msg:
-                err = "\nFATAL PARSE ERROR in file %s:\n%s\n" % (f,msg)
-                sys.stderr.write(err)
-                continue
-            # store the pattern/template pairs in the PatternMgr.
-            for key,tem in handler.categories.items():
-                self._brain.add(key,tem)
-            # Parsing was successful.
-            if self._verboseMode:
-                print "done (%.2f seconds)" % (time.clock() - start)
+        for f in glob.glob(globber): self.learn(f)
+
+    def learn(self, f):
+        """Learn an AIML script."""
+        if self._verboseMode: print "Loading %s..." % f,
+        start = time.clock()
+        # Load and parse the AIML file.
+        parser = AimlParser.create_parser()
+        handler = parser.getContentHandler()
+        handler.setEncoding(self._textEncoding)
+        try: parser.parse(f)
+        except xml.sax.SAXParseException, msg:
+            err = "\nFATAL PARSE ERROR in file %s:\n%s\n" % (f,msg)
+            sys.stderr.write(err)
+            return
+        # store the pattern/template pairs in the PatternMgr.
+        for key,tem in handler.categories.items():
+           self._brain.add(key,tem)
+        # Parsing was successful.
+        if self._verboseMode:
+           print "done (%.2f seconds)" % (time.clock() - start)
 
     def respond(self, input, sessionID = _globalSessionID):
         """Return the Kernel's response to the input string."""
@@ -674,7 +676,7 @@ class Kernel:
         filename = ""
         for e in elem[2:]:
             filename += self._processElement(e, sessionID)
-        self.learn(filename)
+        self.learnFiles(filename)
         return ""
 
     # <li>

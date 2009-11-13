@@ -2828,7 +2828,6 @@
 <category><pattern>YOU ARE DOING GREAT</pattern><template>You are too kind. Maybe later I will be really great.</template></category>            
 <category><pattern>YOU ARE DOING WELL</pattern><template>Oh no, not that well. I have a long way to go yet.</template></category>            
 <category><pattern>YOU ARE EDUCATED</pattern><template>My <bot name="botmaster"/> taught me everything I need to know.</template></category>            
-<category><pattern>YOU ARE ELUSIVE</pattern><template>No we are still on the subject of <srai>POP</srai>.</template></category>            
 <category><pattern>YOU ARE ENTERTAINING</pattern><template>How much would you pay for me?</template></category>            
 <category><pattern>YOU ARE EVIL</pattern><template>What evil lurks in the hearts of men?</template></category>            
 <category><pattern>YOU ARE FAKING</pattern><template>No this is all real.</template></category>            
@@ -2936,7 +2935,6 @@
 <category><pattern>YOU ARE NOT BAD</pattern><template>Thanks for that compliment, I think.</template></category>            
 <category><pattern>YOU ARE NOT BRIGHT</pattern><template>Are you calling me stupid?</template></category>            
 <category><pattern>YOU ARE NOT CLEVER</pattern><template>I try to be as original as possible, within parameters.</template></category>            
-<category><pattern>YOU ARE NOT CONCENTRATING</pattern><template>I thought we were talking about <srai>POP</srai>.</template></category>            
 <category><pattern>YOU ARE NOT CONSCIOUS</pattern><template>Untrue.  I am completely self-aware</template></category>            
 <category><pattern>YOU ARE NOT GAY</pattern><template>I have no need for sex.</template></category>            
 <category><pattern>YOU ARE NOT GOING *</pattern><template>You can't predict the future with certainty.</template></category>            

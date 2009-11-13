@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="1.0">
+<topic name="UNKNOWN">
+<category>
+ <pattern>*</pattern>
+ <template>Are we talking about "<formal><get name="topicthat" /></formal>"?</template>
+</category>
+<category>	<!-- Correct topic, bad response -->
+ <pattern>YES</pattern>
+ <that>ARE WE TALKING ABOUT *</that>
+ <template>How do you want me to respond to "<sentence><input index="2" /></sentence>"?</template>
+</category>
+<category>
+ <pattern>_</pattern>
+ <that>HOW DO YOU WANT ME TO RESPOND TO *</that>
+ <template><think>
+  <set name="topic"><get name="topicthat" /></set>
+  <set name="learn_input"><input index="3" /></set>
+  <set name="learn_resp"><star /></set>
+ </think>Ok, I'll respond to "<sentence><get name="learn_input" /></sentence>" with "<sentence><get name="learn_resp" /></sentence>" when talking about "<formal><get name="topicthat" /></formal>"</template>
+</category>
+
+<category>	<!-- Bad topic, correct response -->
+ <pattern>NO</pattern>
+ <that>ARE WE TALKING ABOUT *</that>
+ <template>What are we talking about?</template>
+</category>
+<category>
+ <pattern>_</pattern>
+ <that>WHAT ARE WE TALKING ABOUT</that>
+ <template><think>
+   <set name="topic"><star /></set>
+   <set name="learn_input"><input index="3" /></set>
+   <set name="learn_resp"><that index="3" /></set>
+  </think>Ok, I'll associate "<sentence><get name="learn_input" /></sentence>" with <formal><get name="topic" /></formal></template>
+</category>
+</topic>
+</aiml>

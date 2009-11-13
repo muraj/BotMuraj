@@ -1,0 +1,16 @@
+<aiml>
+<topic name="THANKS">
+<category>
+ <pattern>*</pattern>
+ <template>
+ <random>
+ <li>You're welcome</li>
+ <li>np</li>
+ <li>Not a problem</li>
+ <li>k</li>
+ <li>no problem</li>
+ </random>
+ </template>
+</category>
+</topic>
+</aiml>
