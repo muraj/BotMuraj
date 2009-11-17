@@ -1,44 +1,65 @@
 """An intelligent catch-all for conversation. Uses PyAIML module for most of the work. Each channel has it's own session, including PM's. For more information, google \"A.L.I.C.E\""""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import aiml.Kernel
-from thread import start_new_thread
-from time import sleep
+import aiml.Kernel, Bayes, StringIO
+from xml.etree import ElementTree as ET
 RULE=r'.*'
 PRIORITY=500
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed to the bot
 aimlkernel=aiml.Kernel()
+BayesBrain = Bayes.Bayes()
+
+def learnResponse(res, topic, input):
+    """Returns a file pointer with a full xml script to learn off of
+    with the topic, input, and response"""
+    root = ET.Element('aiml')
+    t = ET.SubElement(root,'topic')
+    t.set('name',topic.upper())							#Normalize this.
+    cat = ET.SubElement(t,'category')
+    ET.SubElement(cat,'pattern').text = input.upper()   #Normalize this.
+    ET.SubElement(cat,'template').text = res            #Kinda normalize this.
+    s = StringIO.StringIO(u'')
+    s.write('<?xml version="1.0" encoding="UTF-8" ?>')
+    ET.ElementTree(root).write(s,'utf-8')
+    s.seek(0,0) #Reset the pointer for reading again
+    return s
+
 def PROCESS(bot, args, text):
 	global aimlkernel
 ### Text replacements
 	text=text.replace('\x01ACTION','I')	#To replace actions sent in irc
-	text=text.replace(bot.nick,'you')
-	text=text.replace('\x01','')
+	text=text.replace(bot.nick,'you')	#Make into a direct conversation.
+	text=text.replace('\x01','')		#Remove irc syntax
 ###
 	aimlkernel.setPredicate('name', args[-1], args[1])
-	response=aimlkernel.respond(text, args[1])
-	length=len(response)
-	cat=''
-	if length>450:
-		cat=' --'
-	for i in xrange(0,length,450):
-		if i+450>length:
-			cat=''
-		if args[-1]==args[1]:
-			bot.mesg(response[i:i+450]+cat,args[1], args[-1])
-		else: bot.mesg(response[i:i+450]+cat, args[1], args[-1])
+	currentTopic = aimlkernel.getPredicate('topic')
+	if not 'unknown' in currentTopic.lower():
+		aimlkernel.setPredicate('topicthat',currentTopic)	#In case of a correct topic and bad answer, set the current topic
+		aimlkernel.setPredicate('topic',BayesBrain.guess(text)[0])	#Guess the new topic
+	resp = aimlkernel.respond(text)
+	bot.mesg(resp,args[1],args[-1])
+	if 'unknown' in currentTopic.lower() and not 'unknown' in aimlkernel.getPredicate('topic').lower() and text.lower() != 'nevermind':	#Needs to be fixed better.
+		#Getting out of the user side of the learning
+		topic = aimlkernel.getPredicate('topic')
+		input = aimlkernel.getPredicate('learn_input')
+		while 1:
+			BayesBrain.train(topic, input)
+			if BayesBrain.guess(input)[0] == topic.encode('utf-8').upper(): break
+		BayesBrain.save('Bayes/bayes.bay')	# Untested...
+		if aimlkernel.getPredicate('learn_resp') != '':
+			f=learnResponse(text, topic, input)
+			bot.log('Learned - '+f.getvalue(),'debug')
+			aimlkernel.learn(f)
+			aimlkernel.saveBrain('aiml/IRCBot.brn')
+			if not f.closed: f.close()
 	return False
-def saveBrains():
-	while True:
-		sleep(3600)	#save every hour
-		aimlkernel.saveBrain('./aiml/IRCBot.brn')
 def INIT(bot):
 	_INIT(bot.nick, bot.master, bot.config)
 def _INIT(name, master, config=None):
-	global aimlkernel
+	global aimlkernel, BayesBrain
 	aimlkernel.verbose(True)
-	aimlkernel.loadBrain('./aiml/IRCBot.brn')
+	aimlkernel.loadBrain('aiml/IRCBot.brn')			#TODO: Pull into config file
 	if config==None: return
 	if not config.has_section('aimltalk'): return
 	aimlkernel.setPredicate('secure','yes',master)
@@ -47,6 +68,7 @@ def _INIT(name, master, config=None):
 	aimlkernel.setBotPredicate('master',master)
 	for var,val in config.items('aimltalk'):
 		aimlkernel.setBotPredicate(var,val)
+	BayesBrain.load('/home/cperry/BotMuraj/Bayes/bayes.bay')	#TODO: Pull into config file
 if __name__=='__main__':
 	_INIT('BotMuraj','muraj')
 	while 1: 

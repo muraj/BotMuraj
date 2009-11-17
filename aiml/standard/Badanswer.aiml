@@ -3,20 +3,21 @@
 <topic name="UNKNOWN">
 <category>
  <pattern>*</pattern>
- <template>Are we talking about "<formal><get name="topicthat" /></formal>"?</template>
+ <template><think>
+  <set name="learn_input"><star /></set>	<!-- We'll be using this a lot, so save it. -->
+ </think>Are we talking about "<formal><get name="topicthat" /></formal>"?</template>
 </category>
 <category>	<!-- Correct topic, bad response -->
  <pattern>YES</pattern>
  <that>ARE WE TALKING ABOUT *</that>
- <template>How do you want me to respond to "<sentence><input index="2" /></sentence>"?</template>
+ <template>How do you want me to respond to "<sentence><get name="learn_input" /></sentence>"?</template>
 </category>
 <category>
- <pattern>_</pattern>
+ <pattern>*</pattern>
  <that>HOW DO YOU WANT ME TO RESPOND TO *</that>
  <template><think>
+  <set name="learn_resp"><star /></set>	<!-- Order matters here... -->
   <set name="topic"><get name="topicthat" /></set>
-  <set name="learn_input"><input index="3" /></set>
-  <set name="learn_resp"><star /></set>
  </think>Ok, I'll respond to "<sentence><get name="learn_input" /></sentence>" with "<sentence><get name="learn_resp" /></sentence>" when talking about "<formal><get name="topicthat" /></formal>"</template>
 </category>
 
@@ -26,13 +27,33 @@
  <template>What are we talking about?</template>
 </category>
 <category>
- <pattern>_</pattern>
+ <pattern>*</pattern>
  <that>WHAT ARE WE TALKING ABOUT</that>
  <template><think>
    <set name="topic"><star /></set>
-   <set name="learn_input"><input index="3" /></set>
-   <set name="learn_resp"><that index="3" /></set>
+   <set name="learn_resp"></set>
   </think>Ok, I'll associate "<sentence><get name="learn_input" /></sentence>" with <formal><get name="topic" /></formal></template>
 </category>
+
+<category>
+ <pattern>NEVERMIND</pattern> <!-- Exit strategy -->
+ <template><think>	<!-- Reset all the variables -->
+  <set name="topic"><get name="topicthat" /></set>
+  <set name="learn_input"></set>
+  <set name="learn_resp"></set>
+ </think>Ok then.</template>
+</category>
 </topic>
+
+<category>
+ <pattern>BAD ANSWER</pattern>	<!-- Bad reply, learn a new one! -->
+ <template><think>
+  <set name="topic">UNKNOWN</set>
+ </think><srai><input index="2" /></srai></template>
+</category>
+
+<category>	<!-- Catch-all for all responses. -->
+ <pattern>*</pattern>
+ <template><think><set name="topic">UNKNOWN</set></think><sr /></template>
+</category>
 </aiml>

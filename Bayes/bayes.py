@@ -3,19 +3,19 @@ class Tokenizer:
 	WORDREG = re.compile(r'(\w+)', re.UNICODE)
 	#This is by no means a comprehensive list, but can help in reducing
 	#the bucket sizes by a lot.
-	COMMON = ['the', 'of', 'a', 'I', 'and', 'to', 'an', 'in', 'is', 'it', 
+	"""COMMON = ['the', 'of', 'a', 'I', 'and', 'to', 'an', 'in', 'is', 'it', 
 		'you', 'he', 'she', 'that', 'was', 'for', 'on', 'are', 'with', 'as',
 		'his', 'her', 'they', 'be', 'at', 'have', 'this', 'from', 'or', 'had',
 		'by', 'but', 'some', 'what', 'there', 'we', 'can', 'out', 'other',
 		'all', 'were', 'your', 'when', 'up', 'use', 'how', 'each', 'which']
-	COMMON_REGEX = [re.compile(r'(?i)\b'+c+r'\b',re.UNICODE) for c in COMMON]
+	COMMON_REGEX = [re.compile(r'(?i)\b'+c+r'\b',re.UNICODE) for c in COMMON]"""
 	def tokenize(self, input):
 		"""Returns a generator of words"""
 		if type(input) != unicode: input=unicode(input, 'utf-8')
 		input=input.lower()
-		for r in self.COMMON_REGEX:
-			input = r.sub('',input)
-		else: input = re.sub(r'\b\d+\b','',input,re.UNICODE)
+		"""for r in self.COMMON_REGEX:
+			input = r.sub('',input)"""
+		input = re.sub(r'\b\d+\b','',input,re.UNICODE)
 		return self.WORDREG.findall(input)
 class Bayes:
 	MEST = 1	# Rare word handling
@@ -34,7 +34,7 @@ class Bayes:
 			x[w] = x.get(w,0) + 1
 			self.buckets[topic] = x	#Due to how shelve works...
 			self.tokens+=1
-		if hasattr(self.buckets,'sync'): self.buckets.sync()
+		#if hasattr(self.buckets,'sync'): self.buckets.sync()
 	def guess(self, input):
 		"""Given the input as a string, return the best guess at the topic."""
 		denom = 0.0
@@ -60,18 +60,18 @@ class Bayes:
 		if hasattr(self.buckets, 'sync'):
 			self.buckets.sync()
 			return
-		sh=shelve.open(filename)
+		sh=shelve.open(filename, flag='c')
 		for k,b in self.buckets.iteritems(): sh[k]=b
 		sh.sync()
 		sh.close()
 	def load(self, filename):
 		"""Load the brain"""
 		if hasattr(self.buckets,'close'): self.buckets.close()
-		self.buckets=shelve.open(filename)
+		self.buckets=shelve.open(filename, flag='w')
 		self.tokens=reduce(lambda x,y: x+len(self.buckets[y]), self.buckets, 0)
 if __name__ == '__main__':	#Unit tests
 	import glob, os
-	training = glob.glob('*.txt')
+	training = glob.glob('bayes_train/*.txt')
 	brain = Bayes()
 	for fn in training:
 		print 'Training on',os.path.basename(fn)[:-4]
