@@ -153,4 +153,6 @@ defaultNormal = {
     "it's": "it is",
     "it'd": "it would",
     "it'll": "it will",
+
+	"there's": "there is",
 }    

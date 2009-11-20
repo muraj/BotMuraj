@@ -13,7 +13,7 @@
  <template>How do you want me to respond to "<sentence><get name="learn_input" /></sentence>"?</template>
 </category>
 <category>
- <pattern>*</pattern>
+ <pattern>_</pattern>
  <that>HOW DO YOU WANT ME TO RESPOND TO *</that>
  <template><think>
   <set name="learn_resp"><star /></set>	<!-- Order matters here... -->
@@ -27,7 +27,7 @@
  <template>What are we talking about?</template>
 </category>
 <category>
- <pattern>*</pattern>
+ <pattern>_</pattern>
  <that>WHAT ARE WE TALKING ABOUT</that>
  <template><think>
    <set name="topic"><star /></set>
@@ -42,6 +42,14 @@
   <set name="learn_input"></set>
   <set name="learn_resp"></set>
  </think>Ok then.</template>
+</category>
+<category>
+ <pattern>NVM</pattern>
+ <template><srai>NEVERMIND</srai></template>
+</category>
+<category>
+ <pattern>NEVER MIND</pattern>
+ <template><srai>NEVERMIND</srai></template>
 </category>
 </topic>
 

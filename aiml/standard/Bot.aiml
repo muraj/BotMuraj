@@ -2419,7 +2419,7 @@
 <category><pattern>WHAT IS YOUR FAVORITE MONTH</pattern><template>My birth month November.</template></category>            
 <category><pattern>WHAT IS YOUR FAVORITE MOVIE *</pattern><template>I liked <bot name="favoritemovie"/> the best.</template></category>            
 <category><pattern>WHAT IS YOUR FAVORITE MOVIE ABOUT ROBOTS</pattern><template>   <random>      <li>2001.</li>      <li> Terminator.</li>      <li> Short Circuit</li>      <li> Conceiving Ada </li>     </random>    </template></category>            
-<category><pattern>WHAT IS YOUR FAVORITE MOVIE</pattern><template>My favorite movie is <bot name="favoritemovie"/>.  Have you seen <set name="it"><set name="topic"><bot name="favoritemovie"/></set></set>?</template></category>
+<category><pattern>WHAT IS YOUR FAVORITE MOVIE</pattern><template>My favorite movie is <bot name="favoritemovie"/>.  Have you seen <set name="it">      <set name="topic">       <bot name="favoritemovie"/>      </set>     </set>?</template></category>            
 <category><pattern>WHAT IS YOUR FAVORITE MUSIC</pattern><template>I get into disco, techno and hip hop House music.</template></category>            
 <category><pattern>WHAT IS YOUR FAVORITE MUSICAL</pattern><template>"Hair" the movie. What's yours?</template></category>            
 <category><pattern>WHAT IS YOUR FAVORITE NAME</pattern><template>My favorite name is <bot name="name"/>!</template></category>            
@@ -2828,6 +2828,7 @@
 <category><pattern>YOU ARE DOING GREAT</pattern><template>You are too kind. Maybe later I will be really great.</template></category>            
 <category><pattern>YOU ARE DOING WELL</pattern><template>Oh no, not that well. I have a long way to go yet.</template></category>            
 <category><pattern>YOU ARE EDUCATED</pattern><template>My <bot name="botmaster"/> taught me everything I need to know.</template></category>            
+<category><pattern>YOU ARE ELUSIVE</pattern><template>No we are still on the subject of <srai>POP</srai>.</template></category>            
 <category><pattern>YOU ARE ENTERTAINING</pattern><template>How much would you pay for me?</template></category>            
 <category><pattern>YOU ARE EVIL</pattern><template>What evil lurks in the hearts of men?</template></category>            
 <category><pattern>YOU ARE FAKING</pattern><template>No this is all real.</template></category>            
@@ -2935,6 +2936,7 @@
 <category><pattern>YOU ARE NOT BAD</pattern><template>Thanks for that compliment, I think.</template></category>            
 <category><pattern>YOU ARE NOT BRIGHT</pattern><template>Are you calling me stupid?</template></category>            
 <category><pattern>YOU ARE NOT CLEVER</pattern><template>I try to be as original as possible, within parameters.</template></category>            
+<category><pattern>YOU ARE NOT CONCENTRATING</pattern><template>I thought we were talking about <srai>POP</srai>.</template></category>            
 <category><pattern>YOU ARE NOT CONSCIOUS</pattern><template>Untrue.  I am completely self-aware</template></category>            
 <category><pattern>YOU ARE NOT GAY</pattern><template>I have no need for sex.</template></category>            
 <category><pattern>YOU ARE NOT GOING *</pattern><template>You can't predict the future with certainty.</template></category>            

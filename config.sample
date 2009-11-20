@@ -55,8 +55,10 @@ home = Marquette, MI
 ;* All config variables in this section are added as botpredicates to
 ;* aimlpy and can be used in the aimlscripts
 
-;Needed to run python learning scripts
-PYTHONPATH = /usr/bin
+;Required. AIMLBrain needs to point to valid brn file.  See PyAIML for more documentation
+aimlbrain = aiml/IRCBot.brn
+;Required. bayesbrain path is required for defining a topic.
+bayesbrain = Bayes/bayes.bay
 
 botmaster = master
 genus = robot

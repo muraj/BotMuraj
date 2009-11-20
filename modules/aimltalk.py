@@ -1,8 +1,9 @@
 """An intelligent catch-all for conversation. Uses PyAIML module for most of the work. Each channel has it's own session, including PM's. For more information, google \"A.L.I.C.E\""""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import aiml.Kernel, Bayes, StringIO
+import Bayes, StringIO
 from xml.etree import ElementTree as ET
+import aiml
 RULE=r'.*'
 PRIORITY=500
 COMMAND='PRIVMSG'
@@ -11,19 +12,21 @@ aimlkernel=aiml.Kernel()
 BayesBrain = Bayes.Bayes()
 
 def learnResponse(res, topic, input):
-    """Returns a file pointer with a full xml script to learn off of
-    with the topic, input, and response"""
-    root = ET.Element('aiml')
-    t = ET.SubElement(root,'topic')
-    t.set('name',topic.upper())							#Normalize this.
-    cat = ET.SubElement(t,'category')
-    ET.SubElement(cat,'pattern').text = input.upper()   #Normalize this.
-    ET.SubElement(cat,'template').text = res            #Kinda normalize this.
-    s = StringIO.StringIO(u'')
-    s.write('<?xml version="1.0" encoding="UTF-8" ?>')
-    ET.ElementTree(root).write(s,'utf-8')
-    s.seek(0,0) #Reset the pointer for reading again
-    return s
+	"""Returns a file pointer with a full xml script to learn off of
+	with the topic, input, and response"""
+	root = ET.Element('aiml')
+	t = ET.SubElement(root,'topic')
+	subber = aiml.WordSub.WordSub(aiml.DefaultSubs.defaultNormal)
+	topic = subber.sub(topic).upper()
+	t.set('name',topic)
+	cat = ET.SubElement(t,'category')
+	ET.SubElement(cat,'pattern').text = subber.sub(input).upper()   #Normalize this.
+	ET.SubElement(cat,'template').text = res            #Kinda normalize this.
+	s = StringIO.StringIO(u'')
+	s.write('<?xml version="1.0" encoding="UTF-8" ?>')
+	ET.ElementTree(root).write(s,'utf-8')
+	s.seek(0,0) #Reset the pointer for reading again
+	return s
 
 def PROCESS(bot, args, text):
 	global aimlkernel
@@ -58,17 +61,19 @@ def INIT(bot):
 	_INIT(bot.nick, bot.master, bot.config)
 def _INIT(name, master, config=None):
 	global aimlkernel, BayesBrain
+	import os.path
+	notPredicates = ['aimlbrain', 'bayesbrain', 'secure', 'name', 'master']
 	aimlkernel.verbose(True)
-	aimlkernel.loadBrain('aiml/IRCBot.brn')			#TODO: Pull into config file
-	if config==None: return
-	if not config.has_section('aimltalk'): return
+	aimlkernel.loadBrain(os.path.abspath(config.get('aimltalk','aimlbrain')))
+	BayesBrain.load(os.path.abspath(config.get('aimltalk','bayesbrain')))
 	aimlkernel.setPredicate('secure','yes',master)
-	aimlkernel.setPredicate('PYTHONPATH',config.get('aimltalk','pythonpath'))
 	aimlkernel.setBotPredicate('name',name)
 	aimlkernel.setBotPredicate('master',master)
+	aimlkernel.setPredicate('topic','Greeting')
+	aimlkernel.setPredicate('topicthat','Greeting')
 	for var,val in config.items('aimltalk'):
+		if var in notPredicates: continue
 		aimlkernel.setBotPredicate(var,val)
-	BayesBrain.load('/home/cperry/BotMuraj/Bayes/bayes.bay')	#TODO: Pull into config file
 if __name__=='__main__':
 	_INIT('BotMuraj','muraj')
 	while 1: 
