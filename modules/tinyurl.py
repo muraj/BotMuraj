@@ -75,7 +75,7 @@ def mungeUrl(url):
 	spliturl[2]=spliturl[2].encode('idna')	#convert domain to idna format
 	if len(spliturl) > 3:	#clean up the path of unicode
 		for i,s in enumerate(spliturl[3:]):
-			spliturl[i+3]=urllib.quote(s.encode('utf-8'),'?&=#')
+			spliturl[i+3]=urllib.quote(s.encode('utf-8'),'?&=#%')
 	return '/'.join(spliturl)	#Join them back up!
 def getUrl(url):
 	"""Returns the (MIME, title) of a url where title is the <title>[content]</title> in html"""
