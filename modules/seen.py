@@ -9,6 +9,8 @@ COMMAND='PRIVMSG'
 DIRECTED=3	#Can be either directed or not
 users = {}
 def last_seen(x, y, c, z):
+	if type(x) != unicode: x = x.decode('utf-8')
+	if type(y) != unicode: y = y.decode('utf-8')
 	t=datetime.now()-z
 	weeks,days=divmod(t.days,7)
 	minutes,seconds=divmod(t.seconds,60)
@@ -22,7 +24,7 @@ def PROCESS(bot, args, text):
 			for u in ag[1].split(',')[:5]:
 				u=re.sub(r'[\.?!]','',u)
 				if not u in users:
-					bot.mesg(u"\"%s\" is unknown" % (u), args[1])
+					bot.mesg(u"\"%s\" is unknown" % (u.decode('utf-8')), args[1])
 				else: bot.mesg(last_seen(u,users[u][1],users[u][2],users[u][0]), args[1])
 		else:
 			for u,i in users.iteritems():

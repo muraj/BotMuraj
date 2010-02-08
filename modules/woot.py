@@ -16,7 +16,7 @@ def PROCESS(bot, args, text):
 	if condition.lower() != 'new': product=condition+' '+product
 	percent=e.findtext('/channel/item/{http://www.woot.com/}soldout')
 	wootoff=e.findtext('/channel/item/{http://www.woot.com/}wootoff')
-	wootoff='' if wootoff=='False' else 'WootOff! '
+	wootoff='' if wootoff=='False' else '\x02\x0301,08WootOff!\x0F '
 	if percent == 'False':
 		percent=100*float(e.findtext('channel/item/{http://www.woot.com/}soldoutpercentage'))
 		percent="%.2f%% sold" % (percent)
