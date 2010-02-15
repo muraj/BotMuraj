@@ -27,10 +27,10 @@ scale = 2.53510117e-6
 
 [tinyurl]
 ;Maximum length of title
-mintitlesize = 60
+mintitlesize = 1
 
 ;Url to get tinyurl from.
-tinyurl = http://tinyurl.com/api-create.php?
+tinyurl = http://api.tr.im/v1/trim_simple?
 
 ;Dump links to rss?
 userss = true
