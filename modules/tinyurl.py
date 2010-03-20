@@ -89,7 +89,7 @@ def getUrl(url):
 		if not mime.lower() == 'text/html':
 			return (mime, length), url.split('/')[-1]
 		html=f.read(8096)	#Should grab most titles
-		group=re.search(r'(?i)\<title\>(.*?)\<\/title\>',html, re.DOTALL)
+		group=re.search(r'(?i)\<title\s*\>(.*?)\<\/title\s*\>',html, re.DOTALL)
 		if not group: return (mime, length), title
 		title=unicode(group.group(1),'utf-8', 'replace')
 		for k, v in htmllib.HTMLParser.entitydefs.iteritems():
