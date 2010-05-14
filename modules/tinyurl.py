@@ -33,13 +33,9 @@ def PROCESS(bot, args, text):
 		bot.log(e,'warning')
 		title='N/A'
 	if len(title)>50: title=title[:47]+'...'
-	try:
-		if USE_RSS: sendToRSS(info,url,title,args[-1])
-	except Exception as e:
-		bot.log("Error sending to rss feed: %s" % (e),'error')
 	if len(url) < MINSIZE and (not text.startswith('tinyurl ')): return True
 	try:
-		returl=getTiny(url)
+		returl=getTiny(groups.group(0))	#Don't tinyurl the munged up url
 	except Exception as e:
 		bot.log("Error getting tinyurl: %s" % (e),'error')
 		return False
@@ -57,12 +53,7 @@ def PROCESS(bot, args, text):
 def INIT(bot):	#Config setup!
 	global USE_RSS, RSS_FILEPATH, TINYURL, RSS_TITLE, RSS_LINK, RSS_MAX, MINSIZE
 	if not bot.config.has_section('tinyurl'): return
-	USE_RSS = bot.config.getboolean('tinyurl','userss')
-	RSS_FILEPATH = os.path.abspath(bot.config.get('tinyurl','rssfilepath'))
 	TINYURL = bot.config.get('tinyurl','tinyurl')
-	RSS_TITLE = bot.config.get('tinyurl','rsstitle')
-	RSS_LINK = bot.config.get('tinyurl','rsslink')
-	RSS_MAX = bot.config.getint('tinyurl','rssmax')
 	MINSIZE = bot.config.getint('tinyurl','mintitlesize')
 def mungeUrl(url):
 	if type(url)!=unicode:	#Convert unicode bytes to full chars
@@ -117,59 +108,3 @@ def getTiny(url):
 	finally:
 		if f: f.close()
 	return tinyurl
-def setupFeed():
-	link=RSS_LINK+os.path.split(RSS_FILEPATH)[1]
-	template="""\
-<?xml version="1.0" encoding="utf-8" ?>
-<?xml-stylesheet type="text/css" title="CSS_formating" href="rss.css" ?>
-<?xml-stylesheet type="text/xsl" href="rss.xsl" ?>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-<channel>
-<title>%s</title>
-<link>%s</link>
-<description>blah</description>
-<language>en-us</language>
-<ns0:link rel="self" xmlns:ns0="http://www.w3.org/2005/Atom" href="%s" type="application/rss+xml" />
-</channel>
-</rss>
-""" % (RSS_TITLE,link,link)
-	f=open(RSS_FILEPATH,'w')
-	f.write(template)
-	f.close()
-def sendToRSS(info, url, title, poster):
-	"""Appends the url to the rss feed"""
-	if url == RSS_LINK+os.path.split(RSS_FILEPATH)[1]: return
-	if not os.path.exists(RSS_FILEPATH): setupFeed()
-	e=ElementTree()
-	e.parse(RSS_FILEPATH)
-	chan=e.find('channel')
-	r=[]
-	for i,it in enumerate(chan.getiterator('item')):
-		if it.find('guid').text == url:
-			it.find('pubDate').text=strftime(RSS_DATEFORMAT,localtime())
-			chan.remove(it)		#Keep in sorted order
-			chan.insert(4,it)
-			break
-		elif i+1>=RSS_MAX: r.append(it)
-	else:
-		for it in r: chan.remove(it)
-		it=Element('item')
-		SubElement(it,'title').text=title
-		SubElement(it,'link').text=url
-		SubElement(it,'pubDate').text=strftime(RSS_DATEFORMAT,localtime())
-		SubElement(it,'guid').text=url
-		if info[0] != 'text/html':
-			enc=SubElement(it,'enclosure')
-			enc.set('url',url)
-			enc.set('type',info[0])
-			enc.set('length',info[1])
-		chan.insert(5,it)	#4 in order to bypass all the <title> and other tags
-	f=codecs.open(RSS_FILEPATH,'w+','utf-8')
-	f.write("""<?xml version="1.0" encoding="utf-8" ?>
-<?xml-stylesheet type="text/css" title="CSS_formating" href="rss.css" ?>
-<?xml-stylesheet type="text/xsl" href="rss.xsl" ?>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-""")
-	e.write(f)
-	f.close()

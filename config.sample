@@ -30,22 +30,7 @@ scale = 2.53510117e-6
 mintitlesize = 1
 
 ;Url to get tinyurl from.
-tinyurl = http://api.tr.im/v1/trim_simple?
-
-;Dump links to rss?
-userss = true
-
-;Path to rss file
-rssfilepath = /home/cperry/pub/feed.xml
-
-;Title of rss
-rsstitle = CSC Link Dump
-
-;Link for rss
-rsslink = http://vr.nmu.edu/~cperry/
-
-;Max number of links allowed
-rssmax = 5
+tinyurl = http://tinyurl.com/api-create.php?
 
 [weather]
 ;Default location to pull weather info from
