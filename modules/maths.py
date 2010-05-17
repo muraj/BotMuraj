@@ -2,6 +2,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import math
+import random
 from multiprocessing import Process, Queue
 RULE=r'.*'
 PRIORITY=450
@@ -13,6 +14,7 @@ safe_dict['abs'] = abs
 def func():
     return safe_dict.keys()
 safe_dict['func'] = func
+safe_dict['random'] = random.random
 def evalProc(queue, input):
 	try:
 		x = eval(input, {'__builtins__':None}, safe_dict)
