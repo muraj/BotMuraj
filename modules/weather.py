@@ -25,7 +25,8 @@ def _process(url,zip,forecast=True):
 	str=[" "]
 	try:
 		e=xml.etree.ElementTree.parse(url)
-	except:
+	except Exception e:
+		bot.log(e,'error')
 		return ['Google returned a malformed xml']
 	try:
 		return ["Google returned the following error: %s" % (e.find('/weather/problem_cause').attrib['data'])]
