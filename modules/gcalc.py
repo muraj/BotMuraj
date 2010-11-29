@@ -1,11 +1,13 @@
 """Google Calculator for IRC! Syntax: \"gcalc <maths>\"."""
 import re
 import urllib
+from urllib.parse import urlencode
+from urllib.request import FancyURLopener
 RULE=r'^gcalc (.+)$'
 PRIORITY=0
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed to the bot
-class Opener(urllib.FancyURLopener):	#Needed to grab google searches (it doesn't like urllib user-agent)
+class Opener(FancyURLopener):	#Needed to grab google searches (it doesn't like urllib user-agent)
 	version='Mozilla/5.0'
 def PROCESS(bot, args, text):
 	str=re.search(r'^gcalc (.+)$', text)
@@ -13,9 +15,8 @@ def PROCESS(bot, args, text):
 		bot.mesg('No result', args[1])
 		return False
 	else: str=str.group(1)
-	params = urllib.urlencode({'num': 1, 'q' : str.lower()})
-	urllib._urlopener = Opener()
-	f=urllib.urlopen("http://www.google.com/search?%s" % params)
+	params = urlencode({'num': 1, 'q' : str.lower()})
+	f=Opener().open("http://www.google.com/search?%s" % params)
 	str=f.read()
 	ret=re.search(r'<h2 class=r style="font-size:138%"><b>(.+?)</b></h2>', str)
 	f.close()

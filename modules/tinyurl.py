@@ -2,6 +2,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import urllib, re, socket, sys, htmllib, httplib, os.path, codecs
+from urllib.parse import urlencode
+from urllib.request import FancyURLopener
 from xml.etree.ElementTree import ElementTree, dump, SubElement, Element	#ElementTree is my new best friend
 from time import localtime, strftime
 
@@ -11,17 +13,11 @@ COMMAND='PRIVMSG'
 DIRECTED=3	#Can both be directed and not
 MINSIZE=60
 TINYURL='http://tinyurl.com/api-create.php?'
-USE_RSS=False
-RSS_FILEPATH=os.path.abspath('./feed.xml')
-RSS_TITLE='CSC Link Dump'
-RSS_LINK='http://localhost/'
-RSS_DATEFORMAT='%a, %d %b %Y %T %z'
-RSS_MAX=5
-class Opener(urllib.FancyURLopener):
+class Opener(FancyURLopener):
 	version='Mozilla/5.0'
+opener = Opener()
 def PROCESS(bot, args, text):
 	global TINYURL
-	urllib._urlopener=Opener()	#Changes the user-agent to Mozilla
 	groups=re.search(r'(https?:\/\/\S+)',text)
 	if not groups:
 		return True
@@ -51,7 +47,7 @@ def PROCESS(bot, args, text):
 	bot.mesg("Tiny: \x02\x1F%s\x0F \"%s\"" % (returl, title ), args[1])
 	return False
 def INIT(bot):	#Config setup!
-	global USE_RSS, RSS_FILEPATH, TINYURL, RSS_TITLE, RSS_LINK, RSS_MAX, MINSIZE
+	global TINYURL, MINSIZE
 	if not bot.config.has_section('tinyurl'): return
 	TINYURL = bot.config.get('tinyurl','tinyurl')
 	MINSIZE = bot.config.getint('tinyurl','mintitlesize')
@@ -73,7 +69,7 @@ def getUrl(url):
 	title, mime='N/A', 'application/octet-stream'
 	socket.setdefaulttimeout(3)
 	try:
-		f=urllib.urlopen(url)
+		f=opener.open(url)
 		mime = f.info().type
 		length = f.info().get('Content-Length')
 		if length == None: length=1	#Safe to assume that the minimum is always at least a byte
@@ -99,7 +95,7 @@ def getTiny(url):
 	"""Returns the TinyURL version of <url>"""
 	tinyurl="N/A"
 	try:
-		param=urllib.urlencode({'url':url})
+		param=urlencode({'url':url})
 		f=urllib.urlopen("%s%s" % (TINYURL, param))
 		ret=f.read().rstrip()
 		if re.match(r'(?i)^(http:\/\/\S+)$',ret): tinyurl=ret

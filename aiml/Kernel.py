@@ -116,10 +116,10 @@ class Kernel:
         try: cmds = [ commands + "" ]
         except: pass
         for cmd in cmds:
-            print self._respond(cmd, self._globalSessionID)
+            print(self._respond(cmd, self._globalSessionID))
             
         if self._verboseMode:
-            print "Kernel bootstrap completed in %.2f seconds" % (time.clock() - start)
+            print("Kernel bootstrap completed in %.2f seconds" % (time.clock() - start))
 
     def verbose(self, isVerbose = True):
         """Enable/disable verbose output mode."""
@@ -152,20 +152,20 @@ class Kernel:
         NOTE: the current contents of the 'brain' will be discarded!
 
         """
-        if self._verboseMode: print "Loading brain from %s..." % filename,
+        if self._verboseMode: print("Loading brain from %s..." % filename, end='')
         start = time.clock()
         self._brain.restore(filename)
         if self._verboseMode:
             end = time.clock() - start
-            print "done (%d categories in %.2f seconds)" % (self._brain.numTemplates(), end)
+            print("done (%d categories in %.2f seconds)" % (self._brain.numTemplates(), end))
 
     def saveBrain(self, filename):
         """Dump the contents of the bot's brain to a file on disk."""
-        if self._verboseMode: print "Saving brain to %s..." % filename,
+        if self._verboseMode: print("Saving brain to %s..." % filename, end='')
         start = time.clock()
         self._brain.save(filename)
         if self._verboseMode:
-            print "done (%.2f seconds)" % (time.clock() - start)
+            print("done (%.2f seconds)" % (time.clock() - start))
 
     def getPredicate(self, name, sessionID = _globalSessionID):
         """Retrieve the current value of the predicate 'name' from the
@@ -279,14 +279,14 @@ class Kernel:
 
         """
         for f in glob.glob(filename):
-            if self._verboseMode: print "Loading %s..." % f,
+            if self._verboseMode: print("Loading %s..." % f, end='')
             start = time.clock()
             # Load and parse the AIML file.
             parser = AimlParser.create_parser()
             handler = parser.getContentHandler()
             handler.setEncoding(self._textEncoding)
             try: parser.parse(f)
-            except xml.sax.SAXParseException, msg:
+            except xml.sax.SAXParseException as msg:
                 err = "\nFATAL PARSE ERROR in file %s:\n%s\n" % (f,msg)
                 sys.stderr.write(err)
                 continue
@@ -295,7 +295,7 @@ class Kernel:
                 self._brain.add(key,tem)
             # Parsing was successful.
             if self._verboseMode:
-                print "done (%.2f seconds)" % (time.clock() - start)
+                print("done (%.2f seconds)" % (time.clock() - start))
 
     def respond(self, input, sessionID = _globalSessionID):
         """Return the Kernel's response to the input string."""
@@ -525,7 +525,7 @@ class Kernel:
                     except:
                         # No attributes, no name/value attributes, no
                         # such predicate/session, or processing error.
-                        if self._verboseMode: print "Something amiss -- skipping listitem", li
+                        if self._verboseMode: print("Something amiss -- skipping listitem", li)
                         raise
                 if not foundMatch:
                     # Check the last element of listitems.  If it has
@@ -538,11 +538,11 @@ class Kernel:
                     except:
                         # listitems was empty, no attributes, missing
                         # name/value attributes, or processing error.
-                        if self._verboseMode: print "error in default listitem"
+                        if self._verboseMode: print("error in default listitem")
                         raise
             except:
                 # Some other catastrophic cataclysm
-                if self._verboseMode: print "catastrophic condition failure"
+                if self._verboseMode: print("catastrophic condition failure")
                 raise
         return response
         
@@ -1087,14 +1087,14 @@ def _testTag(kern, tag, input, outputList):
     """
     global _numTests, _numPassed
     _numTests += 1
-    print "Testing <" + tag + ">:",
+    print("Testing <" + tag + ">:", end='')
     response = kern.respond(input).decode(kern._textEncoding)
     if response in outputList:
-        print "PASSED"
+        print("PASSED")
         _numPassed += 1
         return True
     else:
-        print "FAILED (response: '%s')" % response.encode(kern._textEncoding, 'replace')
+        print("FAILED (response: '%s')" % response.encode(kern._textEncoding, 'replace'))
         return False
 
 if __name__ == "__main__":
@@ -1129,7 +1129,7 @@ if __name__ == "__main__":
     there's nothing to worry about.
     """
     if not _testTag(k, 'date', 'test date', ["The date is %s" % time.asctime()]):
-        print date_warning
+        print(date_warning)
     
     _testTag(k, 'formal', 'test formal', ["Formal Test Passed"])
     _testTag(k, 'gender', 'test gender', ["He'd told her he heard that her hernia is history"])
@@ -1175,11 +1175,11 @@ if __name__ == "__main__":
     _testTag(k, 'whitespace preservation', 'test whitespace', ["Extra   Spaces\n   Rule!   (but not in here!)    But   Here   They   Do!"])
 
     # Report test results
-    print "--------------------"
+    print("--------------------")
     if _numTests == _numPassed:
-        print "%d of %d tests passed!" % (_numPassed, _numTests)
+        print("%d of %d tests passed!" % (_numPassed, _numTests))
     else:
-        print "%d of %d tests passed (see above for detailed errors)" % (_numPassed, _numTests)
+        print("%d of %d tests passed (see above for detailed errors)" % (_numPassed, _numTests))
 
     # Run an interactive interpreter
     #print "\nEntering interactive mode (ctrl-c to exit)"

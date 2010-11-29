@@ -1,6 +1,6 @@
-"""An intelligent catch-all for conversation. Uses PyAIML module for most of the work. Each channel has it's own session, including PM's. For more information, google \"A.L.I.C.E\""""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+"""An intelligent catch-all for conversation. Uses PyAIML module for most of the work. Each channel has it's own session, including PM's. For more information, google \"A.L.I.C.E\" """
 import aiml.Kernel
 from thread import start_new_thread
 from time import sleep
@@ -50,4 +50,4 @@ def _INIT(name, master, config=None):
 if __name__=='__main__':
 	_INIT('BotMuraj','muraj')
 	while 1: 
-		print aimlkernel.respond(raw_input('> '))
+		print(aimlkernel.respond(raw_input('> ')))

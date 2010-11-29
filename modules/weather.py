@@ -1,18 +1,20 @@
-"""Displays the weather using the following syntax: 'forecast|weather [zipcode|city, state]'"""
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+"""Displays the weather using the following syntax: 'forecast|weather [zipcode|city, state]'"""
 import urllib
-#from xml.dom import minidom
 import xml.etree.ElementTree
+from urllib.request import FancyURLopener
 RULE=r'^weather|forecast(\s\d{5}|\s[a-zA-z\.,\- ]*,\s*[A-Za-z]{2})?$'
 HOME='Marquette, MI'
 PRIORITY=-10
 COMMAND='PRIVMSG'
 DIRECTED=1	#Must be directed at
+class Opener(urllib.request.FancyURLopener):
+    version='Mozilla/5.0'
 def PROCESS(bot, args, text):
 	zip=text[8:]
 	if not zip or zip=='': zip=HOME
-	url=urllib.urlopen('http://www.google.com/ig/api?'+urllib.urlencode({'weather':zip}))
+	url=Opener.open('http://www.google.com/ig/api?'+urllib.request.urlencode({'weather':zip}))
 	try:
 		strings=_process(url,zip,text.startswith('forecast'))
 	except Exception as e:
@@ -65,4 +67,4 @@ def color_hum(t):
 	if   t > 75: return 3	#Green
 	elif t > 50: return 9	#Light Green
 	elif t > 30: return 0	#White
-	else: return 8		#Yellow
+	else: 		 return 8		#Yellow

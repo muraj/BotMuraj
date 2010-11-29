@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import socket, asyncore, asynchat, sys, re, imp, glob, os
-import traceback, logging, ConfigParser
+import traceback, logging, configparser
 class Bot(asynchat.async_chat):
 	def __init__(self, config_file):
 		self.config = config_file
@@ -30,7 +30,7 @@ class Bot(asynchat.async_chat):
 			self.mods[k]=sorted(l, lambda m1,m2: m1.PRIORITY-m2.PRIORITY)
 	def addhook(self, mod):
 		if mod==None: return None
-		if not self.mods.has_key(mod.COMMAND):
+		if not mod.COMMAND in self.mods:
 			self.mods[mod.COMMAND]=[]
 		self.mods[mod.COMMAND].append(mod)
 		return mod
@@ -39,7 +39,7 @@ class Bot(asynchat.async_chat):
 	def fileimport(self, fn):
 		if not fn.endswith('.py'):
 			return None
-		f=file(fn,'r')
+		f=open(fn,'r')
 		desc=('.py','r',imp.PY_SOURCE)
 		m=imp.load_module(os.path.split(fn[:-3])[1], f, fn, desc)
 		if self.checkmod(m):
@@ -119,10 +119,10 @@ class Bot(asynchat.async_chat):
 	def checkmod(self, m):
 		if not hasattr(m,'RULE'): return False
 		if not hasattr(m,'PRIORITY'): return False
-		if not (hasattr(m,'PROCESS') and callable(m.PROCESS)): return False
+		if not (hasattr(m,'PROCESS') and hasattr(m.PROCESS,'__call__')): return False
 		if not hasattr(m,'COMMAND'): return False
 		if not hasattr(m,'DIRECTED'): m.DIRECTED = True	#Default to directed
-		if hasattr(m,'INIT') and callable(m.INIT): 
+		if hasattr(m,'INIT') and hasattr(m.INIT,'__call__'):
 			m.INIT(self)	#Optional initialization
 		return True
 	def mesg(self, text, chan, user=''):
@@ -138,7 +138,8 @@ if __name__=='__main__':
 	parser.add_option('-d','--daemon',help='Start as daemon',action='store_true',default=False,dest='daemon')
 	parser.add_option('-c','--config-file',help='Use specified config file (default is ./config)', metavar='FILE', default='./config')
 	(options, args) = parser.parse_args()
-	config = ConfigParser.SafeConfigParser()
+	if not os.path.exists(options.config_file): raise Exception("Config file not found")
+	config = configparser.SafeConfigParser()
 	config.read(options.config_file)
 	if options.daemon:
 		import resource
@@ -156,10 +157,6 @@ if __name__=='__main__':
 			raise e
 		if pid!=0: os._exit(0)	#Child1 exits
 		os.nice(40)	#Lower priority.
-		bot=Bot(config_file=config)
-		bot.connectServer(config.get('main','server'), config.getint('main','port'))
-		bot.run()
-	else:
-		bot=Bot(config_file=config)
-		bot.connectServer(config.get('main','server'), config.getint('main','port'))
-		bot.run()
+	bot=Bot(config_file=config)
+	bot.connectServer(config.get('main','server'), config.getint('main','port'))
+	bot.run()
