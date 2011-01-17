@@ -1,7 +1,8 @@
-"""Config Constants"""
-#!/usr/bin/python
+#!/usr/bin/env python2 --
 # -*- coding: utf-8 -*-
-
+import sys
+if (2, 4) > sys.version_info[0:2] > (2, 7):
+    print("!WARNING! Unsupported python version")
 import socket, asyncore, asynchat, sys, re, imp, glob, os
 import traceback, logging, ConfigParser
 class Bot(asynchat.async_chat):
