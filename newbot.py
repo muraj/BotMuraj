@@ -1,5 +1,4 @@
-"""Config Constants"""
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import socket, asyncore, asynchat, sys, re, imp, glob, os
