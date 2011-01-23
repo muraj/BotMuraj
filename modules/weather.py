@@ -25,7 +25,7 @@ def _process(url,zip,forecast=True):
 	str=[" "]
 	try:
 		e=xml.etree.ElementTree.parse(url)
-	except Exception e:
+	except Exception as e:
 		bot.log(e,'error')
 		return ['Google returned a malformed xml']
 	try:

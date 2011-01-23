@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 --
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import sys
 if (2, 4) > sys.version_info[0:2] > (2, 7):
