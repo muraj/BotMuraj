@@ -1,1 +1,1 @@
-from .aiml import *
+from .aiml_cmd import *
