@@ -11,10 +11,11 @@ def parse_tinyurl(body, bot, channel):
   tiny = body.get('id', None)
   bot.say(channel, 'Tiny: ' + tiny.encode('utf8'))
 
-def parse_youtube(body, bot, channel):
+def parse_youtube(body, bot, channel, vid):
   e = xml.etree.ElementTree.fromstring(body)
-  title = e.findtext('title')
-  bot.say(channel, title)
+  title = e.findtext('{http://www.w3.org/2005/Atom}title')
+  url = 'http://youtu.be/' + vid
+  bot.say(channel, "Watch! (or don't, it probably sucks): %s - %s" % (title, url))
 
 @trigger('PRIVMSG', match=r'.*https?:\/\/\S+.*')
 def tinyurl(bot, user, channel, msg):
@@ -25,17 +26,23 @@ def tinyurl(bot, user, channel, msg):
   host = groups.group(1)
   # Remove www from host if it exists...
   host = host[4:] if host.startswith('www.') else host
-  #if host == 'youtube.com' or host == 'youtu.be':
-  #  youtube_groups = re.search(r'\bv=([^&]+)', url)
-  #  if youtube_groups:
-  #    vid = youtube_groups.group(0)
-  #    d = getPage("https://gdata.youtube.com/feeds/api/videos/%s?v=2" % vid)
-  #    # Do something with d here
-  if len(url) < MINLEN: return
-  d=getPage('https://www.googleapis.com/urlshortener/v1/url', method='POST',
-    postdata='{"longUrl": "%s"}' % url, headers={'Content-Type':'application/json'})
-  d.addCallback(parse_tinyurl, bot, channel)
-  d.addErrback(bot.log.err)
+  bot.log.msg('Got url ' + url)
+  youtube_groups = None
+  if host == 'youtube.com':
+    youtube_groups = re.search(r'\bv=([^&]+)', url)
+  else:
+    youtube_groups = re.search(r'be\/([^?]+)', url)
+  if youtube_groups:
+    vid = youtube_groups.group(1)
+    d = getPage("https://gdata.youtube.com/feeds/api/videos/%s?v=2" % vid)
+    d.addCallback(parse_youtube, bot, channel, vid)
+  elif len(url) < MINLEN:
+    return
+  else:
+    d=getPage('https://www.googleapis.com/urlshortener/v1/url', method='POST',
+      postdata='{"longUrl": "%s"}' % url, headers={'Content-Type':'application/json'})
+    d.addCallback(parse_tinyurl, bot, channel)
+    d.addErrback(bot.log.err)
 
 def init(bot):
   global MINLEN
