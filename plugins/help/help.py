@@ -8,7 +8,7 @@ def cmd_help(bot, user, channel, args):
     for fn in bot.iterTriggers():
       if isinstance(fn, Command):
         cmds.append(fn.name)
-    bot.say(channel, "Available comainds: %s.  For more, say '!help CMD'." % ', '.join(cmds))
+    bot.say(channel, "Available commands: %s.  For more, say '!help CMD'." % ', '.join(cmds))
   else:
     for fn in bot.iterTriggers():
       if isinstance(fn, Command) and fn.name == args[0]:
