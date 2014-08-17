@@ -150,6 +150,8 @@ class GlitchBot(irc.IRCClient):
     del self.channels[channel]  # Delete all info about this channel
 
   def privmsg(self, user, channel, msg):
+    if channel == self.nickname:
+      channel, _, _ = user.partition('!')
     for fn in self.iterTriggers():
       try:
         if not fn(self, 'PRIVMSG', user, channel, msg):
