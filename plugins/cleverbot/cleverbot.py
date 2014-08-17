@@ -66,6 +66,6 @@ def cleverbot_trigger(bot, user, channel, msg):
   params['icognocheck'] = hashlib.md5(urllib.urlencode(params)[9:35]).hexdigest()
   print params
   d = getPage(service_url, method='POST', postdata=urllib.urlencode(params),
-      timeout=10)
+      timeout=20)
   d.addCallback(parse_body, bot, user, channel)
   d.addErrback(bot.log.err)
