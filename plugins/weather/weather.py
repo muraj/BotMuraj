@@ -10,8 +10,15 @@ CURRENT_CONDITIONS_URL = \
 
 def handle_body(body, bot, channel):
   body = json.loads(body)
+  if u'results' in body.get(u'response', {}):  # If ambiguous
+    print json.dumps(body[u'response'], sort_keys=True, indent=4, separators=(',', ': '))
+    station_id = body[u'response'][u'results'][0][u'zmw'].encode('utf8')
+    url = CURRENT_CONDITIONS_URL % (API_KEY, 'zmw:' + station_id)
+    d = getPage(url, timeout=10)
+    d.addCallback(handle_body, bot, channel)
+    d.addErrback(bot.log.err)
+    return
   body = body[u'current_observation']
-  print json.dumps(body, sort_keys=True, indent=4, separators=(',',': '))
   loc = body[u'display_location'][u'full']
   w_str = body[u'weather']
   temp = body[u'temp_f']
@@ -31,7 +38,10 @@ given zip or location of server of bot"""
     try:  # Parse zip code
       location = str(int(args[0]))
     except ValueError:
-      return  # Could try to parse state/city, etc
+      location = ' '.join(args)
+      city, _, location = location.partition(',')
+      if len(location) == 0: return
+      location = location.strip().replace(' ', '_') + '/' + city.strip().replace(' ', '_')
   url = CURRENT_CONDITIONS_URL % (API_KEY, location)
   d = getPage(url, timeout=10)
   d.addCallback(handle_body, bot, channel)
