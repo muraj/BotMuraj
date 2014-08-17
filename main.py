@@ -8,6 +8,7 @@ import os.path
 import glob
 import imp
 import sys
+import heapq
 
 from plugin_lib import Trigger
 
@@ -52,10 +53,13 @@ class GlitchBot(irc.IRCClient):
         log.err()
 
   def iterTriggers(self):
-    for m in self.modules:
+    h = []
+    for m in self.modules:    # Not the most efficient way to do this...
       for name, fn in vars(m).iteritems():
         if isinstance(fn, Trigger):
-          yield fn
+          heapq.heappush(h, fn)
+    while len(h) != 0:
+      yield heapq.heappop(h)
 
   def reload_plugin(self, name):
     log.msg("Reloading %s plugin" % name)
@@ -148,7 +152,8 @@ class GlitchBot(irc.IRCClient):
   def privmsg(self, user, channel, msg):
     for fn in self.iterTriggers():
       try:
-        fn(self, 'PRIVMSG', user, channel, msg)
+        if not fn(self, 'PRIVMSG', user, channel, msg):
+          break
       except:
         log.err()
 

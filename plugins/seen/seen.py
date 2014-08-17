@@ -1,13 +1,14 @@
-
 from plugin_lib import command, trigger
-import datetime
+import time
 
 seen_db = {}
 
-@trigger('PRIVMSG')
+@trigger('PRIVMSG', priority=10)
 def seen_track(bot, user, channel, msg):
   global seen_db
-  seen_db[user] = datetime.utcnow()
+  user, _, _ = user.partition('!')
+  seen_db[user] = time.time()
+  bot.log.msg("Saw %s at %s" % (user, time.ctime(seen_db[user])))
   return True # Continue processing this message
 
 @command('seen')
@@ -18,4 +19,5 @@ def seen_cmd(bot, user, channel, args):
     if t == None:
       bot.say(channel, "I haven't seen %s" % (u))
     else:
-      bot.say(channel, "I saw %s on %s" % (u, t.strftime('%X %Z %x')))
+      localtime = time.localtime(t)
+      bot.say(channel, "I saw %s on %s" % (u, time.strftime("%X %Z %x", localtime)))
