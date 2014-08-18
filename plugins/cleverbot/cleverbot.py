@@ -55,7 +55,6 @@ def parse_body(body, bot, user, channel):
 @trigger('PRIVMSG', priority=9999)
 def cleverbot_trigger(bot, user, channel, msg):
   global service_url, post_params, sessions
-  print user, channel
   if not user.startswith(channel):
     if not msg.startswith(bot.nickname):
       return
