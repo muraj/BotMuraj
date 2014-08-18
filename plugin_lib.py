@@ -51,10 +51,10 @@ class Command(Trigger):
 
 def trigger(cmd, user='*!*@*', channel='*', match='.*', priority=999):
   def decorator(func):
-    return Trigger(cmd, func, user, channel, match)
+    return Trigger(cmd, func, user, channel, match, priority=priority)
   return decorator
 
 def command(name, user='*!*@*', channel='*', priority=999):
   def decorator(func):
-    return Command(name, func, user, channel)
+    return Command(name, func, user, channel, priority=priority)
   return decorator
