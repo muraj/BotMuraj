@@ -138,7 +138,7 @@ class GlitchBot(irc.IRCClient):
 
   def irc_NICK(self, prefix, params):
     for chan in self.channels.iterkeys():
-      self.refreshIAL(channel)  # HACK! Make this more efficient please!
+      self.refreshIAL(chan)  # HACK! Make this more efficient please!
 
   def irc_PART(self, prefix, params):
     channel = params[0]
