@@ -177,7 +177,10 @@ class GlitchBotFactory(protocol.ClientFactory):
 
 if __name__ == '__main__':
   config = ConfigParser.ConfigParser()
-  config.read(['default.cfg', os.path.expanduser('~/.config/glitchbot.cfg')])
+  defaultCfg = os.path.expanduser('~/.config/glitchbot')
+  if not os.path.exists(defaultCfg):
+    os.mkdir(defaultCfg)
+  config.read(['default.cfg', defaultCfg + '/config.cfg'])
   host = config.get('Bot', 'host')
   port = 6667
   if config.has_option('Bot', 'port'):
