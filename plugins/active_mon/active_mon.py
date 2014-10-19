@@ -1,5 +1,6 @@
 from plugin_lib import command, trigger
 import shelve
+import os.path
 
 active_db = None
 reducefn = len
