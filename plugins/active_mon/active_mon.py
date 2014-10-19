@@ -10,7 +10,7 @@ cmd = 'souls'
 def activity_track(bot, user, channel, msg):
   global active_db, reducefn
   user, _, _ = user.partition('!')
-  active_db[user.lower()] = reducefn(msg)
+  active_db[user.lower()] = active_db.get(user.lower(), 0) + reducefn(msg)
   active_db.sync()
   return True # Continue processing this message
 
