@@ -31,7 +31,7 @@ def top_active(bot, user, channel, args):
 
 def init(bot):
   global active_db, reducefn
-  ACTIVE_DB_FILE = '~/.config/glichbot/active.shelve'
+  ACTIVE_DB_FILE = '~/.config/glitchbot/active.shelve'
   if bot.config.has_option('active_mon', 'db'):
     ACTIVE_DB_FILE = bot.config.get('active_mon', 'db')
   active_db = shelve.open(os.path.expanduser(ACTIVE_DB_FILE))
