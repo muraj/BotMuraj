@@ -27,7 +27,7 @@ def activity(bot, user, channel, args):
 def top_active(bot, user, channel, args):
   global active_db, cmd
   top = sorted(active_db.items(), key=lambda t: t[1], reverse=True)[0]
-  bot.say(channel, "%s has the most %s with %s", top[0], cmd, str(top[1]))
+  bot.say(channel, "%s has the most %s with %s" % (top[0], cmd, str(top[1])))
 
 def init(bot):
   global active_db, reducefn
