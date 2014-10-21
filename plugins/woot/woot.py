@@ -11,8 +11,8 @@ def parse_body(body, bot, url, channel):
     product = condition +' '+product
   percent=e.findtext('channel/item/{http://www.woot.com/}soldout')
   wootoff=e.findtext('channel/item/{http://www.woot.com/}wootoff')
-  wootoff='' if wootoff=='False' else '\x02\x0301,08WootOff!\x0F '
-  if percent == 'False':
+  wootoff='' if wootoff.lower()=='false' else '\x02\x0301,08WootOff!\x0F '
+  if percent.lower() == 'false':
     percent=100*float(e.findtext('channel/item/{http://www.woot.com/}soldoutpercentage'))
     percent="%.2f%% sold" % (percent)
   else: percent='\x0300,05SOLD OUT\x0F'
