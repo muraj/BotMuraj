@@ -4,6 +4,7 @@ from collections import OrderedDict
 import urllib
 import hashlib
 import re
+from HTMLParser import HTMLParser
 
 service_url = 'http://www.cleverbot.com/webservicemin'
 
@@ -49,6 +50,8 @@ def parse_body(body, bot, user, channel):
   params['divert'] = vals[23]
   sessions[channel] = params
   user, _, _ = user.partition('!')
+  # Parse out the html with proper unicode characters
+  vals[16] = HTMLParser().unescape(vals[16]).encode('utf8')
   bot.msg(channel, "%s: %s" % (user, vals[16]))
   
 
@@ -63,7 +66,6 @@ def cleverbot_trigger(bot, user, channel, msg):
   params = sessions.get(channel, post_params)
   params['stimulus'] = msg
   params['icognocheck'] = hashlib.md5(urllib.urlencode(params)[9:35]).hexdigest()
-  print params
   d = getPage(service_url, method='POST', postdata=urllib.urlencode(params),
       timeout=20)
   d.addCallback(parse_body, bot, user, channel)
