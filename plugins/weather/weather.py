@@ -9,6 +9,7 @@ CURRENT_CONDITIONS_URL = \
   'http://api.wunderground.com/api/%s/conditions/q/%s.json'
 
 def handle_body(body, bot, channel):
+  wind_dir_dict = {'East': 'E', 'West': 'W', 'North': 'N', 'South': 'S' }
   body = json.loads(body)
   if u'results' in body.get(u'response', {}):  # If ambiguous
     print json.dumps(body[u'response'], sort_keys=True, indent=4, separators=(',', ': '))
@@ -21,11 +22,19 @@ def handle_body(body, bot, channel):
   body = body[u'current_observation']
   loc = body[u'display_location'][u'full']
   w_str = body[u'weather']
+  if 'snow' in w_str.lower():
+    w_str = u'\u2744 ' + w_str
+  elif 'rain' in w_str.lower():
+    w_str = u'\u2602 ' + w_str
+  elif 'cloud' in w_str.lower():
+    w_str = u'\u2601 ' + w_str
   temp = body[u'temp_f']
+  feels_like = float(body[u'feelslike_f'])
   humidity = body[u'relative_humidity']
   wind = body[u'wind_mph']
   wind_dir = body[u'wind_dir']
-  msg = u"%s - %s, Temp: %.1f\u2109 Humidity: %s Wind: %s %d MPH" % (loc, w_str, temp, humidity, wind_dir, wind)
+  wind_dir = wind_dir_dict.get(wind_dir, wind_dir)
+  msg = u"%s - %s Temp: %.1f\u2109(%.1f\u2109) Hum: %s Wind: %s %d MPH" % (loc, w_str, temp, feels_like, humidity, wind_dir, wind)
   bot.say(channel, msg.encode('utf8'))
 
 @command('weather')
