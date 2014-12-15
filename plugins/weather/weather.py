@@ -67,7 +67,7 @@ given zip or location of server of bot"""
   change = len(args) > 0 and args[0] == 'default'
   if change: args.pop(0)
   if len(args) == 0:
-    location = loc_db.get(username, None)
+    location = None if change else loc_db.get(username, None)
     if location == None:
       location = 'autoip.json?geo_ip=' + get_user_location(host, bot.hostname)
   else:
