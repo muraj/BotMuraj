@@ -72,7 +72,7 @@ given zip or location of server of bot"""
       location = 'autoip.json?geo_ip=' + get_user_location(host, bot.hostname)
   else:
     try:  # Parse zip code
-      location = str(int(args[0]))
+      location = str(int(args[0])) + '.json'
     except ValueError:
       location = ' '.join(args)
       city, _, location = location.partition(',')
@@ -90,7 +90,7 @@ given zip or location of server of bot"""
 def init(bot):
   global API_KEY, loc_db
   API_KEY = bot.config.get('weather', 'api')
-  WEATHER_DB_FILE = '~/.config/glitchbot/seen.shelve'
+  WEATHER_DB_FILE = '~/.config/glitchbot/weather.shelve'
   if bot.config.has_option('weather', 'db'):
     WEATHER_DB_FILE = bot.config.get('weather', 'db')
   loc_db = shelve.open(os.path.expanduser(WEATHER_DB_FILE))
