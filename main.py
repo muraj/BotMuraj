@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, defer
