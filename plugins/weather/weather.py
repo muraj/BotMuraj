@@ -12,8 +12,9 @@ loc_db = None
 CURRENT_CONDITIONS_URL = \
   'http://api.wunderground.com/api/%s/conditions/q/%s'
 
-def handle_body(body, bot, channel):
+def handle_body(body, bot, channel, metric):
   wind_dir_dict = {'East': 'E', 'West': 'W', 'North': 'N', 'South': 'S' }
+  unitbased = [u'temp_c', u'feelslike_c', u'wind_kph', u'\u2103', 'KPH'] if metric else [u'temp_f', u'feelslike_f', u'wind_mph', u'\u2109', 'MPH']
   body = json.loads(body)
   if u'results' in body.get(u'response', {}):  # If ambiguous
     print json.dumps(body[u'response'], sort_keys=True, indent=4, separators=(',', ': '))
@@ -32,18 +33,17 @@ def handle_body(body, bot, channel):
     w_str = u'\u2602 ' + w_str
   elif 'cloud' in w_str.lower():
     w_str = u'\u2601 ' + w_str
-  temp = body[u'temp_f']
-  feels_like = float(body[u'feelslike_f'])
+  temp = body[unitbased[0]]
+  feels_like = float(body[unitbased[1]])
   humidity = body[u'relative_humidity']
-  wind = body[u'wind_mph']
+  wind = body[unitbased[2]]
   wind_dir = body[u'wind_dir']
   wind_dir = wind_dir_dict.get(wind_dir, wind_dir)
-  msg = u"%s - %s Temp: %.1f\u2109(%.1f\u2109) Hum: %s Wind: %s %d MPH" % (loc, w_str, temp, feels_like, humidity, wind_dir, wind)
+  msg = u"%s - %s Temp: %4.1f%s(%4.1f%s) Hum: %s Wind: %s %d %s" % (loc, w_str, temp, unitbased[3], feels_like, unitbased[3], humidity, wind_dir, wind, unitbased[4])
   bot.say(channel, msg.encode('utf8'))
 
-# First, look in the db for the user's location
-# if not found, try the user's host -> ip -> geo
-#  replace localhost with connected server's ip
+# try the user's host -> ip -> geo
+# replace localhost with connected server's ip
 # default to connected server's ip
 def get_user_location(host, default):
   import socket
@@ -66,10 +66,17 @@ given zip or location of server of bot"""
   username, _, host = user.partition('@')
   change = len(args) > 0 and args[0] == 'default'
   if change: args.pop(0)
+  metric = False
+  try:
+    metric = args.pop(args.index('-m')) != None
+  except ValueError:
+    pass
   if len(args) == 0:
     location = None if change else loc_db.get(username, None)
     if location == None:
       location = 'autoip.json?geo_ip=' + get_user_location(host, bot.hostname)
+    elif type(location) != str:
+      location, metric = location[0], location[1]
   else:
     try:  # Parse zip code
       location = str(int(args[0])) + '.json'
@@ -80,11 +87,11 @@ given zip or location of server of bot"""
       location = location.strip().replace(' ', '_') + '/' + city.strip().replace(' ', '_')
       location += '.json'
   if change:
-    loc_db[username] = location
+    loc_db[username] = [location, metric]
     loc_db.sync()
   url = CURRENT_CONDITIONS_URL % (API_KEY, location)
   d = getPage(url, timeout=10)
-  d.addCallback(handle_body, bot, channel)
+  d.addCallback(handle_body, bot, channel, metric)
   d.addErrback(bot.log.err)
 
 def init(bot):
