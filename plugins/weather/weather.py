@@ -25,7 +25,7 @@ def handle_body(body, bot, channel, metric):
     d.addErrback(bot.log.err)
     return
   body = body[u'current_observation']
-  loc = body[u'display_location'][u'full']
+  loc = body[u'display_location'][u'full'] + ' ' + body[u'display_location'][u'zip']
   w_str = body[u'weather']
   if 'snow' in w_str.lower():
     w_str = u'\u2744 ' + w_str
