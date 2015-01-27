@@ -11,7 +11,7 @@ def activity_track(bot, user, channel, msg):
   global active_db, reducefn
   user, _, _ = user.partition('!')
   user_chan = user.lower() + '!' + channel
-  active_db[user_chan] = active_db.get(user_chan, 0) + reducefn(msg)
+  active_db[user_chan] = active_db.get(user_chan, 0) + reducefn(msg.decode('utf-8'))
   active_db.sync()
   return True # Continue processing this message
 
