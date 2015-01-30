@@ -47,7 +47,7 @@ class Command(Trigger):
     def cb_wrapper(bot, user, channel, msg):
       return callback(bot, user, channel, shlex.split(msg)[1:])
     cb_wrapper.__doc__ = callback.__doc__
-    Trigger.__init__(self, 'PRIVMSG', cb_wrapper, user, channel, '!' + name, priority=priority)
+    Trigger.__init__(self, 'PRIVMSG', cb_wrapper, user, channel, '!' + name + r'\b', priority=priority)
 
 def trigger(cmd, user='*!*@*', channel='*', match='.*', priority=999):
   def decorator(func):
