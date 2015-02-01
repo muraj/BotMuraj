@@ -19,7 +19,7 @@ class GlitchBot(irc.IRCClient):
     self.reactor = reactor
     self.pluginDir = os.path.dirname(os.path.realpath(__file__)) + '/plugins'
     self.channels = {}
-    self.modules = []
+    self.modules = {}
     self.sentMessages = 0
     self._namesCallbacks = {}
     self.log = log
@@ -35,26 +35,44 @@ class GlitchBot(irc.IRCClient):
     sys.path.append(os.path.realpath(__file__))
     self.load_plugins()
 
+  def load_plugin(self, name):
+    log.msg("Loading %s plugin..." % name)
+    if not self.config.getboolean(name, 'enable'):
+      return False
+
+    module = self.modules.get(name, None)
+    if module != None:
+      return True   # Already loaded plugin
+
+    try:    # Load the module with the plugin
+      f, p, desc = imp.find_module(name, [os.path.join(self.pluginDir, name)])
+      module = imp.load_module(name, f, p, desc)
+    except:
+      log.err()
+      return False
+
+    for dep in getattr(module, 'dependencies', []):
+      self.load_plugin(dep)
+
+    try:
+      getattr(module, 'init', lambda b: None)(self)
+    except:
+      log.err()
+      return False
+
+    self.modules[name] = module
+    return True
+
   def load_plugins(self):
     log.msg('Loading plugins...')
-    self.modules = []
+    self.modules = {}
     for plugin in glob.glob(self.pluginDir + '/*/'):
       key = os.path.basename(os.path.dirname(plugin))
-      try:
-        if not self.config.getboolean(key, 'enable'):
-          continue
-        log.msg("Loading %s plugin..." % key)
-        f, p, desc = imp.find_module(key, [plugin])
-        module = imp.load_module(key, f, p, desc)
-        if hasattr(module, 'init') and callable(module.init):
-          module.init(self)
-        self.modules.append(module)
-      except:
-        log.err()
+      self.load_plugin(key)
 
   def iterTriggers(self):
     h = []
-    for m in self.modules:    # Not the most efficient way to do this...
+    for k,m in self.modules.iteritems():    # Not the most efficient way to do this...
       for name, fn in vars(m).iteritems():
         if isinstance(fn, Trigger):
           heapq.heappush(h, fn)
@@ -63,16 +81,28 @@ class GlitchBot(irc.IRCClient):
 
   def reload_plugin(self, name):
     log.msg("Reloading %s plugin" % name)
-    for i,m in enumerate(self.modules):
-      if name == m.__name__:
-        try:
-          m = imp.reload(m)
-          if hasattr(m, 'init') and callable(m.init):
-            m.init(self)
-          log.msg("Reloaded %s plugin" % name)
-          self.modules[i] = m
-        except:
-          log.err()
+    m = self.modules.get(name, None)
+    if m == None: return False
+
+    log.msg("Reloading %s plugin..." % name)
+    try:
+      m = imp.reload(m)
+    except:
+      log.err()
+      return False
+
+    for dep in getattr(module, 'dependencies', []):
+      self.load_plugin(dep)
+
+    log.msg("Reinitializing %s plugin..." % name)
+    try:
+      getattr(module, 'init', lambda b: None)(self)
+    except:
+      log.err()
+      return False
+
+    self.modules[name] = m
+    return True
 
   def signedOn(self):
     if not self.config.has_option('Bot', 'chans'): return
