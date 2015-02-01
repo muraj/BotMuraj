@@ -109,71 +109,95 @@ class GlitchBot(irc.IRCClient):
     for c in self.config.get('Bot', 'chans').strip('"').split(' '):
       if c: self.join(c)
 
-  def userMode(self, channel, nick):
-    nicklist = self.channels.get(channel, {})
-    return next(( v[1] for v in nicklist.itervalues() if v[0] == nick), None)
+  def userModes(self, channel, nick):
+    return self.channels.get(channel, {}).get(nick, '')
     
   def isOp(self, channel, nick):
-    nicklist = self.channels.get(channel, {})
-    mode = self.userMode(channel, nick)
-    return ('@' in mode) if mode else False
+    return '@' in self.userModes(channel, nick)
+
+  def isHalfOp(self, channel, nick):
+    return '%' in self.userModes(channel, nick)
 
   def isAdmin(self, channel, nick):
-    nicklist = self.channels.get(channel, {})
-    mode = self.userMode(channel, nick)
-    return ('*' in mode) if mode else False
+    return '*' in self.userModes(channel, nick)
+
+  def isOwner(self, channel, nick):
+    return '~' in self.userModes(channel, nick)
 
   def hasVoice(self, channel, nick):
-    nicklist = self.channels.get(channel, {})
-    mode = self.userMode(channel, nick)
-    return ('+' in mode) if mode else False
+    return '+' in self.userModes(channel, nick)
 
-  def __setNames(self, nickDict, channel):
-    self.channels[channel] = nickDict
+  def __setNames(self, nickList, channel):
+    modes = '@*+%~&'
+    ndict = {}
+    for nick in nickList:
+      for i,c in enumerate(nick):
+        if c in modes: continue
+        ndict[nick[i:]] = nick[:i]
+        break
+    self.channels[channel] = ndict
 
   def refreshIAL(self, channel):
     log.msg('Refreshing IAL for channel ' + channel)
+    self.names(channel).addCallback(self.__setNames, channel)
+
+  def names(self, channel):
     channel = channel.lower()
-    d = defer.Deferred()
-    self.sendLine('WHO ' + channel)
-    li = self._namesCallbacks.get(channel, ([],{}))
-    li[0].append(d)
-    self._namesCallbacks[channel] = li
-    d.addCallback(self.__setNames, channel)
-    return d
+    cbs = self._namesCallbacks.get(channel, ([],[]))
+    cbs[0].append(defer.Deferred())
+    self._namesCallbacks[channel] = cbs
+    self.sendLine('NAMES ' + channel)
+    return cbs[0][-1]
 
-  def irc_RPL_WHOREPLY(self, prefix, params):
-    channel = params[1].lower()
-    nick, user, host, mode = params[5], params[2], params[3], params[6]
-    if not channel in self._namesCallbacks: return
-    self._namesCallbacks[channel][1][user + '@' + host] = [ nick, mode ]
+  def irc_RPL_NAMREPLY(self, prefix, params):
+    channel = params[2].lower()
+    nicklist = params[3].split()
+    cbs = self._namesCallbacks.get(channel, None)
+    if cbs == None: return
+    cbs[1].extend(nicklist)
+    self._namesCallbacks[channel] = cbs
 
-  def irc_RPL_ENDOFWHO(self, prefix, params):
+  def irc_RPL_ENDOFNAMES(self, prefix, params):
     channel = params[1].lower()
-    if not channel in self._namesCallbacks: return
-    nickDict = self._namesCallbacks[channel][1]
-    for cb in self._namesCallbacks[channel][0]:
-      cb.callback(nickDict)
-    del self._namesCallbacks[channel]
+    try:
+      cbs = self._namesCallbacks.pop(channel)
+    except KeyError:
+      return
+    for cb in cbs[0]:
+      cb.callback(cbs[1])
 
   def joined(self, channel):
     log.msg('Joined channel: ' + channel)
     self.channels[channel] = {}
     self.refreshIAL(channel)
 
+  def userJoined(self, user, channel):
+    self.refreshIAL(channel)
+
+  def userLeft(self, user, channel):
+    chan = self.channels.get(channel, {})
+    if user in chan:
+      del chan[user]
+    self.channels[channel] = chan
+
+  def userQuit(self, user, msg):
+    chan = self.channels.get(channel, {})
+    if user in chan:
+      del chan[user]
+    self.channels[channel] = chan
+
+  def userKicked(self, kickee, channel, kicker, msg):
+    chan = self.channels.get(channel, {})
+    if kickee in chan:
+      del chan[kickee]
+    self.channels[channel] = chan
+
+  def userRenamed(self, oldname, newname):
+    for chan in self.channels:
+      self.refreshIAL(chan)
+
   def modeChanged(self, user, channel, set, modes, args):
-    if channel in self.channels:
-      self.refreshIAL(channel)   # HACK! Make this more efficient please!
-    return irc.IRCClient.modeChanged(self, user, channel, set, modes, args)
-
-  def irc_NICK(self, prefix, params):
-    for chan in self.channels.iterkeys():
-      self.refreshIAL(chan)  # HACK! Make this more efficient please!
-
-  def irc_PART(self, prefix, params):
-    channel = params[0]
-    if channel in self.channels:
-      self.refreshIAL(channel)  # HACK! Make this more efficient please!
+    self.refreshIAL(channel)
 
   def left(self, channel):
     log.msg('Left channel: ' + channel)
