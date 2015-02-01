@@ -178,19 +178,19 @@ class GlitchBot(irc.IRCClient):
     chan = self.channels.get(channel, {})
     if user in chan:
       del chan[user]
-    self.channels[channel] = chan
+    self.channels[chan] = chan
 
   def userQuit(self, user, msg):
     chan = self.channels.get(channel, {})
     if user in chan:
       del chan[user]
-    self.channels[channel] = chan
+    self.channels[chan] = chan
 
   def userKicked(self, kickee, channel, kicker, msg):
     chan = self.channels.get(channel, {})
     if kickee in chan:
       del chan[kickee]
-    self.channels[channel] = chan
+    self.channels[chan] = chan
 
   def userRenamed(self, oldname, newname):
     for chan in self.channels:
