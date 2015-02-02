@@ -13,8 +13,8 @@ def parse_tinyurl(body, bot, channel):
 
 def parse_youtube(body, bot, channel, vid):
   e = xml.etree.ElementTree.fromstring(body)
-  title = e.findtext('{http://www.w3.org/2005/Atom}title')
-  url = 'http://youtu.be/' + vid
+  title = e.findtext('{http://www.w3.org/2005/Atom}title').encode('utf8')
+  url = 'http://youtu.be/' + vid.encode('utf8')
   bot.say(channel, "Watch! (or don't, it probably sucks): %s - %s" % (title, url))
 
 @trigger('PRIVMSG', match=r'.*https?:\/\/\S+.*')
