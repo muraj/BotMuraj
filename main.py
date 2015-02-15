@@ -22,6 +22,7 @@ class GlitchBot(irc.IRCClient):
     self.modules = {}
     self.sentMessages = 0
     self._namesCallbacks = {}
+    self._signedOnCallbacks = []
     self.log = log
 
     self.username = config.get('Bot', 'username')
@@ -104,10 +105,16 @@ class GlitchBot(irc.IRCClient):
     self.modules[name] = m
     return True
 
+  def getSignedOnCallback(self):
+    self._signedOnCallbacks.append(Defer.deferred())
+    return self._signedOnCallbacks[-1]
+
   def signedOn(self):
     if not self.config.has_option('Bot', 'chans'): return
     for c in self.config.get('Bot', 'chans').strip('"').split(' '):
       if c: self.join(c)
+    for cb in self._signedOnCallbacks:
+      cb.callback(self)
 
   def userModes(self, channel, nick):
     return self.channels.get(channel, {}).get(nick, '')
@@ -168,7 +175,6 @@ class GlitchBot(irc.IRCClient):
 
   def joined(self, channel):
     log.msg('Joined channel: ' + channel)
-    self.channels[channel] = {}
     self.refreshIAL(channel)
 
   def userJoined(self, user, channel):
@@ -181,10 +187,10 @@ class GlitchBot(irc.IRCClient):
     self.channels[chan] = chan
 
   def userQuit(self, user, msg):
-    chan = self.channels.get(channel, {})
-    if user in chan:
-      del chan[user]
-    self.channels[chan] = chan
+    for chan, userdict in self.channels:
+      if user in userdict:
+        del userdict[user]
+        self.channels[chan] = userdict
 
   def userKicked(self, kickee, channel, kicker, msg):
     chan = self.channels.get(channel, {})
