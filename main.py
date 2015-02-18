@@ -47,7 +47,7 @@ class GlitchBot(irc.IRCClient):
 
     try:    # Load the module with the plugin
       f, p, desc = imp.find_module(name, [os.path.join(self.pluginDir, name)])
-      module = imp.load_module(name, f, p, desc)
+      with f: module = imp.load_module(name, f, p, desc)
     except:
       log.err()
       return False
