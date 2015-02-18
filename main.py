@@ -36,13 +36,13 @@ class GlitchBot(irc.IRCClient):
     sys.path.append(os.path.realpath(__file__))
     self.load_plugins()
 
-  def load_plugin(self, name):
+  def load_plugin(self, name, force=False, load_deps=True):
     log.msg("Loading %s plugin..." % name)
     if not self.config.getboolean(name, 'enable'):
       return False
 
     module = self.modules.get(name, None)
-    if module != None:
+    if module != None and not force:
       return True   # Already loaded plugin
 
     try:    # Load the module with the plugin
@@ -52,8 +52,9 @@ class GlitchBot(irc.IRCClient):
       log.err()
       return False
 
-    for dep in getattr(module, 'dependencies', []):
-      self.load_plugin(dep)
+    if load_deps:
+      for dep in getattr(module, 'dependencies', []):
+        self.load_plugin(dep, force, load_deps)
 
     try:
       getattr(module, 'init', lambda b: None)(self)
@@ -80,31 +81,6 @@ class GlitchBot(irc.IRCClient):
     while len(h) != 0:
       yield heapq.heappop(h)
 
-  def reload_plugin(self, name):
-    log.msg("Reloading %s plugin" % name)
-    m = self.modules.get(name, None)
-    if m == None: return False
-
-    log.msg("Reloading %s plugin..." % name)
-    try:
-      m = imp.reload(m)
-    except:
-      log.err()
-      return False
-
-    for dep in getattr(module, 'dependencies', []):
-      self.load_plugin(dep)
-
-    log.msg("Reinitializing %s plugin..." % name)
-    try:
-      getattr(module, 'init', lambda b: None)(self)
-    except:
-      log.err()
-      return False
-
-    self.modules[name] = m
-    return True
-
   def getSignedOnCallback(self):
     self._signedOnCallbacks.append(Defer.deferred())
     return self._signedOnCallbacks[-1]
@@ -117,7 +93,8 @@ class GlitchBot(irc.IRCClient):
       cb.callback(self)
 
   def userModes(self, channel, nick):
-    return self.channels.get(channel, {}).get(nick, '')
+    mode = self.channels.get(channel, {}).get(nick, '')
+    return mode
     
   def isOp(self, channel, nick):
     return '@' in self.userModes(channel, nick)
@@ -184,10 +161,10 @@ class GlitchBot(irc.IRCClient):
     chan = self.channels.get(channel, {})
     if user in chan:
       del chan[user]
-    self.channels[chan] = chan
+    self.channels[channel] = chan
 
   def userQuit(self, user, msg):
-    for chan, userdict in self.channels:
+    for chan, userdict in self.channels.items():
       if user in userdict:
         del userdict[user]
         self.channels[chan] = userdict
@@ -196,7 +173,7 @@ class GlitchBot(irc.IRCClient):
     chan = self.channels.get(channel, {})
     if kickee in chan:
       del chan[kickee]
-    self.channels[chan] = chan
+    self.channels[channel] = chan
 
   def userRenamed(self, oldname, newname):
     for chan in self.channels:

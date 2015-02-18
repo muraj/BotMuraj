@@ -14,7 +14,7 @@ CURRENT_CONDITIONS_URL = \
 
 def handle_body(body, bot, channel, metric):
   wind_dir_dict = {'East': 'E', 'West': 'W', 'North': 'N', 'South': 'S' }
-  unitbased = [u'temp_c', u'feelslike_c', u'wind_kph', u'\u2103', 'KPH'] if metric else [u'temp_f', u'feelslike_f', u'wind_mph', u'\u2109', 'MPH']
+  unitbased = [u'temp_c', u'feelslike_c', u'wind_kph', u'\u00B0C', 'KPH'] if metric else [u'temp_f', u'feelslike_f', u'wind_mph', u'\u00B0F', 'MPH']
   body = json.loads(body)
   if u'results' in body.get(u'response', {}):  # If ambiguous
     print json.dumps(body[u'response'], sort_keys=True, indent=4, separators=(',', ': '))
@@ -24,15 +24,21 @@ def handle_body(body, bot, channel, metric):
     d.addCallback(handle_body, bot, channel)
     d.addErrback(bot.log.err)
     return
+  if not u'current_observation' in body: return
   body = body[u'current_observation']
-  loc = body[u'display_location'][u'full'] + ' ' + body[u'display_location'][u'zip']
+  loc = body[u'display_location'][u'full']
+  if int(body[u'display_location'][u'zip']) != 0:
+    loc += ' ' + body[u'display_location'][u'zip']
   w_str = body[u'weather']
-  if 'snow' in w_str.lower():
+  w_str_lower = w_str.lower()
+  if 'snow' in w_str_lower:
     w_str = u'\u2744 ' + w_str
-  elif 'rain' in w_str.lower():
+  elif 'rain' in w_str_lower:
     w_str = u'\u2602 ' + w_str
-  elif 'cloud' in w_str.lower():
+  elif 'cloud' in w_str_lower:
     w_str = u'\u2601 ' + w_str
+  elif 'clear' in w_str_lower:
+    w_str = u'\u263C ' + w_str
   temp = body[unitbased[0]]
   feels_like = float(body[unitbased[1]])
   humidity = body[u'relative_humidity']
