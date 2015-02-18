@@ -213,6 +213,7 @@ class GlitchBotFactory(protocol.ClientFactory):
     reactor.stop()
 
 if __name__ == '__main__':
+  log.startLogging(sys.stdout)
   config = ConfigParser.ConfigParser()
   defaultCfg = os.path.expanduser('~/.config/glitchbot')
   if not os.path.exists(defaultCfg):
@@ -224,5 +225,4 @@ if __name__ == '__main__':
     port = config.getint('Bot', 'port')
   fact = GlitchBotFactory(config, reactor)
   reactor.connectTCP(host, port, fact)
-  log.startLogging(sys.stdout)
   reactor.run()
