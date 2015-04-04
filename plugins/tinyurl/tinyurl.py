@@ -5,10 +5,11 @@ import json
 import re
 
 MINLEN=50
+APIKEY=''
 
 def parse_tinyurl(body, bot, channel):
   body = json.loads(body)
-  tiny = body.get('id', None)
+  tiny = body.get('id', '')
   bot.say(channel, 'Tiny: ' + tiny.encode('utf8'))
 
 def parse_youtube(body, bot, channel, vid):
@@ -19,7 +20,7 @@ def parse_youtube(body, bot, channel, vid):
 
 @trigger('PRIVMSG', match=r'.*https?:\/\/\S+.*')
 def tinyurl(bot, user, channel, msg):
-  global MINLEN
+  global MINLEN, APIKEY
   groups = re.search(r'https?:\/\/([^\/\s]+)\S*', msg)
   if not groups: return
   url = groups.group(0)
@@ -39,12 +40,14 @@ def tinyurl(bot, user, channel, msg):
   elif len(url) < MINLEN:
     return
   else:
-    d=getPage('https://www.googleapis.com/urlshortener/v1/url', method='POST',
+    d=getPage('https://www.googleapis.com/urlshortener/v1/url?key='+APIKEY, method='POST',
       postdata='{"longUrl": "%s"}' % url, headers={'Content-Type':'application/json'})
     d.addCallback(parse_tinyurl, bot, channel)
     d.addErrback(bot.log.err)
 
 def init(bot):
-  global MINLEN
+  global MINLEN, APIKEY
   if bot.config.has_option('tinyurl', 'min_len'):
     MINLEN=bot.config.getint('tinyurl', 'min_len')
+  if bot.config.has_option('tinyurl', 'api'):
+    APIKEY=bot.config.get('tinyurl', 'api')
