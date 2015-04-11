@@ -53,16 +53,10 @@ def parse_body(body, bot, user, channel):
   # Parse out the html with proper unicode characters
   vals[16] = HTMLParser().unescape(vals[16]).encode('utf8')
   bot.msg(channel, "%s: %s" % (user, vals[16]))
-  
 
-@trigger('PRIVMSG', priority=9999)
-def cleverbot_trigger(bot, user, channel, msg):
+def cleverbot_respond(bot, user, channel, msg):
   global service_url, post_params, sessions
-  if not user.startswith(channel):
-    if not msg.startswith(bot.nickname):
-      return
-  if msg.startswith(bot.nickname):
-    msg = re.sub(bot.nickname + '\\S+', '', msg).strip()
+  msg = re.sub(bot.nickname, 'cleverbot', msg)
   params = sessions.get(channel, post_params)
   params['stimulus'] = msg
   params['icognocheck'] = hashlib.md5(urllib.urlencode(params)[9:35]).hexdigest()
@@ -70,3 +64,17 @@ def cleverbot_trigger(bot, user, channel, msg):
       timeout=20)
   d.addCallback(parse_body, bot, user, channel)
   d.addErrback(bot.log.err)
+
+#@trigger('ACTION', priority=9999
+def cleverbot_action_trigger(bot, user, channel, msg):
+  msg = '*'+msg+'*'
+  return cleverbot_respond(bot, user, channel, msg)
+
+@trigger('PRIVMSG', priority=9999)
+def cleverbot_trigger(bot, user, channel, msg):
+  if not user.startswith(channel):
+    if not msg.startswith(bot.nickname):
+      return
+  if msg.startswith(bot.nickname):
+    msg = re.sub(bot.nickname + '\\S+', '', msg).strip()
+  return cleverbot_respond(bot, user, channel, msg)
