@@ -25,6 +25,9 @@ class GlitchBot(irc.IRCClient):
     self._signedOnCallbacks = []
     self.log = log
 
+    import time
+    self.start_time = time.time()
+
     self.username = config.get('Bot', 'username')
     if config.has_option('Bot', 'password'):
       self.password = config.get('Bot', 'password')

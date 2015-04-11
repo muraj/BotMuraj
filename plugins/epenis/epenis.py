@@ -1,11 +1,10 @@
 import time
 from plugin_lib import command
 
-START_TIME = time.time()
 SCALE = 80.0 / 31556926.0
 
 def uptime(bot, user, channel, args, penis=False):
-  t = time.time() - START_TIME
+  t = time.time() - bot.start_time
   shaft_len = int(t * SCALE)
   days, t = divmod(t, 24*3600)
   hours, t = divmod(t, 3600)
