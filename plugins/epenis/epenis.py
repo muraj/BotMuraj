@@ -6,11 +6,16 @@ SCALE = 80.0 / 31556926.0
 
 def uptime(bot, user, channel, args, penis=False):
   t = time.time() - START_TIME
-  minutes = int(t / 60)
-  seconds = t - minutes * 60
-  bot.say(channel, "I've been up for %d minutes and %d seconds" % (minutes, seconds))
+  shaft_len = int(t * SCALE)
+  days, t = divmod(t, 24*3600)
+  hours, t = divmod(t, 3600)
+  minutes, seconds = divmod(t, 60)
+  days = '' if days == 0 else "%d days " % days
+  hours = '' if hours == 0 else "%d hours " % hours
+  minutes = '' if minutes == 0 else "%d minutes " % minutes
+  seconds = '' if seconds == 0 else "%d seconds " % seconds
+  bot.say(channel, "I've been up for %s%s%s%s" % (days, hours, minutes, seconds))
   if penis:
-    shaft_len = int(t * SCALE)
     bot.say(channel, '\x03138=' + ('=' * shaft_len) + 'D')
 
 @command('uptime')
