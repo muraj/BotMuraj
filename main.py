@@ -25,6 +25,10 @@ class GlitchBot(irc.IRCClient):
     self._signedOnCallbacks = []
     self.log = log
 
+    # backwards compat for sending ctcp actions
+    if getattr(self, 'me', None) == None:
+      self.me = lambda c,a: self.describe(c,a)
+
     import time
     self.start_time = time.time()
 

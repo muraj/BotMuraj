@@ -52,7 +52,13 @@ def parse_body(body, bot, user, channel):
   user, _, _ = user.partition('!')
   # Parse out the html with proper unicode characters
   vals[16] = HTMLParser().unescape(vals[16]).encode('utf8')
-  bot.msg(channel, "%s: %s" % (user, vals[16]))
+  bot.log.msg("cleverbot got response: '%s'" % vals[16])
+  # Many actions end with '*.', but some end with '*'
+  if vals[16].startswith('*') and (vals[16][-2:] == '*.' or vals[16][-1] == '*'):
+    # send a ctcp action instead
+    bot.me(channel, vals[16][1:(-1 if vals[16][-1] == '*' else -2)])
+  else:
+    bot.msg(channel, "%s: %s" % (user, vals[16]))
 
 def cleverbot_respond(bot, user, channel, msg):
   global service_url, post_params, sessions
@@ -67,6 +73,7 @@ def cleverbot_respond(bot, user, channel, msg):
 
 #@trigger('ACTION', priority=9999
 def cleverbot_action_trigger(bot, user, channel, msg):
+  # Convert the ctcp action to cleverbot format
   msg = '*'+msg+'*'
   return cleverbot_respond(bot, user, channel, msg)
 
