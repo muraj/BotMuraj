@@ -203,6 +203,16 @@ class GlitchBot(irc.IRCClient):
       except:
         log.err()
 
+  def action(self, user, channel, data):
+    if channel == self.nickname:
+      channel, _, _ = user.partition('!')
+    for fn in self.iterTriggers():
+      try:
+        if not fn(self, 'ACTION', user, channel, data):
+          break
+      except:
+        log.err()
+
 class GlitchBotFactory(protocol.ClientFactory):
   def __init__(self, config, reactor):
     self.config = config

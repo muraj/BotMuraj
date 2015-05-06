@@ -63,6 +63,7 @@ def parse_body(body, bot, user, channel):
 def cleverbot_respond(bot, user, channel, msg):
   global service_url, post_params, sessions
   msg = re.sub(bot.nickname, 'cleverbot', msg)
+  bot.log.msg("Sending response: '%s'" % msg)
   params = sessions.get(channel, post_params)
   params['stimulus'] = msg
   params['icognocheck'] = hashlib.md5(urllib.urlencode(params)[9:35]).hexdigest()
@@ -71,7 +72,7 @@ def cleverbot_respond(bot, user, channel, msg):
   d.addCallback(parse_body, bot, user, channel)
   d.addErrback(bot.log.err)
 
-#@trigger('ACTION', priority=9999
+@trigger('ACTION', priority=9999)
 def cleverbot_action_trigger(bot, user, channel, msg):
   # Convert the ctcp action to cleverbot format
   msg = '*'+msg+'*'
