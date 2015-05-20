@@ -97,7 +97,10 @@ def activity(bot, user, channel, args):
 def top_active(bot, user, channel, args):
   """Prints out the current activity score for the user with the highest score."""
   global active_db, cmd
-  top = sorted(active_db.items(), key=lambda t: t[1], reverse=True)[0]
+  def sortFunc(item):
+    if item[0] == '__BLOOMFILTER__': return -1
+    return item[1]
+  top = sorted(active_db.items(), key=sortFunc, reverse=True)[0]
   user, score = top[0].partition('!')[0], top[1]
   bot.say(channel, "%s has the most %s with %s" % (user, cmd, str(score)))
 
