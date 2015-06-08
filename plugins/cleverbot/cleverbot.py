@@ -25,7 +25,7 @@ def parse_body(body, bot, user, channel):
   if len(vals) < 24:
     bot.log.err('Returned list is too small')
     return
-  params = sessions.get(channel, post_params)
+  params, cookiejar = sessions.get(channel, [post_params, {}])
   params['sessionid'] = vals[1]
   params['logurl'] = vals[2]
   params['vText8'] = vals[3]
@@ -48,7 +48,7 @@ def parse_body(body, bot, user, channel):
   params['typingData'] = vals[22]
   params['divert'] = vals[23]
   params['divert'] = vals[23]
-  sessions[channel] = params
+  sessions[channel] = [params, cookiejar]
   user, _, _ = user.partition('!')
   # Parse out the html with proper unicode characters
   vals[16] = HTMLParser().unescape(vals[16]).encode('utf8')
@@ -64,11 +64,16 @@ def cleverbot_respond(bot, user, channel, msg):
   global service_url, post_params, sessions
   msg = re.sub(bot.nickname, 'cleverbot', msg)
   bot.log.msg("Sending response: '%s'" % msg)
-  params = sessions.get(channel, post_params)
+  params, cookiejar = sessions.get(channel, [post_params, {}])
+  sessions[channel] = [params, cookiejar]
+  if not cookiejar: # Get initial session cookie
+    d = getPage('http://www.cleverbot.com/', cookies=cookiejar)
+    d.addCallback(lambda _: cleverbot_respond(bot, user, channel, msg))
+    return
   params['stimulus'] = msg
   params['icognocheck'] = hashlib.md5(urllib.urlencode(params)[9:35]).hexdigest()
   d = getPage(service_url, method='POST', postdata=urllib.urlencode(params),
-      timeout=20)
+      timeout=20, cookies=cookiejar)
   d.addCallback(parse_body, bot, user, channel)
   d.addErrback(bot.log.err)
 
