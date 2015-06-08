@@ -12,7 +12,7 @@ bloomFilter = None
 
 def hash_func(s, seed):
   # TODO: replace with something more efficient
-  return int(hashlib.sha256(s + str(seed)).hexdigest(), base=16)
+  return int(hashlib.sha256((s + str(seed)).encode('utf8')).hexdigest(), base=16)
 
 class BloomFilter(object):
   def __init__(self, n, p, filename, hash_f=hash_func):
