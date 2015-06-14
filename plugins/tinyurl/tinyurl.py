@@ -12,7 +12,6 @@ def parse_tinyurl(body, bot, channel):
   bot.say(channel, 'Tiny: ' + tiny.encode('utf8'))
 
 def parse_youtube(body, bot, channel, vid):
-  print 'parsing youtube body', body
   body = json.loads(body)
   video_list = body.get(u'items',[])
   title = ''
