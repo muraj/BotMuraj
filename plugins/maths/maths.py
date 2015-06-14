@@ -9,13 +9,22 @@ try:
   import pint
   ureg = pint.UnitRegistry()
   ureg.default_format = 'P'
+  Quantity = ureg.Quantity
 except ImportError:
-  ureg = None
+  ureg, Quantity = None, None
 
 def safe_pow(a,b):
   va, vb = a, b
-  if isinstance(a, complex) or isinstance(b, complex):
-    va, vb = (a**2).real, (b**2).real # sqr norm
+  if isinstance(a, complex):
+    va = (a**2).real
+  elif isinstance(a, Quantity):
+    va = a.magnitude
+
+  if isinstance(b, complex):
+    vb = (b**2).real
+  elif isinstance(b, Quantity):
+    vb = b.magnitude
+
   if va < 1000000 and vb < 1000000:
     return op.pow(a, b)
   else:
