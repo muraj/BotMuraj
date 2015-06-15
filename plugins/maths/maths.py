@@ -13,7 +13,7 @@ try:
 except ImportError:
   ureg, Quantity = None, None
 
-def safe_pow(a,b):
+def safe_pow(a,b,z=None):
   va, vb = a, b
   if isinstance(a, complex):
     va = (a**2).real
@@ -26,7 +26,7 @@ def safe_pow(a,b):
     vb = b.magnitude
 
   if va < 1000000 and vb < 1000000:
-    return op.pow(a, b)
+    return pow(a, b, z)
   else:
     raise OverflowError()
 
@@ -47,19 +47,21 @@ safe_functions = ['ceil', 'fabs', 'floor', 'trunc', 'exp', 'sqrt', 'log', 'log10
                   'erf', 'erfc', 'gamma', 'lgamma',
                   'degrees', 'radians']
 
+def math_func(f):
+  def func(*args):
+    for a in args:
+      if isinstance(a, complex):
+        return getattr(cmath, f)(*args)
+      else:
+        return getattr(math, f)(*args)
+  return func
+  
+
 for f in safe_functions:
-  if hasattr(cmath, f):
-    def func(*args):
-      for a in args:
-        if isinstance(a, complex):
-          return getattr(cmath, f)(*args)
-        else:
-          return getattr(math, f)(*args)
-  else:
-    func = getattr(math, f)
-  functions[f] = func
+  functions[f] = math_func(f) if hasattr(cmath, f) else getattr(math, f)
 
 functions['fact'] = lambda x: functions['gamma'](x+1)
+functions['pow'] = safe_pow
 
 def eval_(node):
   global functions, constants
