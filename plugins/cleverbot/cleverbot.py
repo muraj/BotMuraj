@@ -47,23 +47,29 @@ def parse_body(body, bot, user, channel):
   params['lineChoicesAbbrev'] = vals[21]
   params['typingData'] = vals[22]
   params['divert'] = vals[23]
-  params['divert'] = vals[23]
   sessions[channel] = [params, cookiejar]
   user, _, _ = user.partition('!')
   # Parse out the html with proper unicode characters
-  vals[16] = HTMLParser().unescape(vals[16]).encode('utf8')
-  bot.log.msg("cleverbot got response: '%s'" % vals[16])
+  resp = vals[16] = HTMLParser().unescape(vals[16]).encode('utf8')
+  resp = re.sub(r'\|([A-Za-z0-9]{1,4})', lambda x: unichr(int(x.group(1), 16)), resp)
+  resp = resp.encode('utf8')
+  bot.log.msg("cleverbot got response: '%s'" % resp)
   # Many actions end with '*.', but some end with '*'
-  if vals[16].startswith('*') and (vals[16][-2:] == '*.' or vals[16][-1] == '*'):
+  if resp.startswith('*') and (resp[-2:] == '*.' or resp[-1] == '*'):
     # send a ctcp action instead
-    bot.me(channel, vals[16][1:(-1 if vals[16][-1] == '*' else -2)])
+    bot.me(channel, resp[1:(-1 if resp[-1] == '*' else -2)])
   else:
-    bot.msg(channel, "%s: %s" % (user, vals[16]))
+    bot.msg(channel, "%s: %s" % (user, resp))
 
 def cleverbot_respond(bot, user, channel, msg):
   global service_url, post_params, sessions
   msg = re.sub(bot.nickname, 'cleverbot', msg)
   bot.log.msg("Sending response: '%s'" % msg)
+  encodedmsg = ''
+  for c in msg.decode('utf8', errors='replace'):
+    encodedmsg += c if ord(c) < 128 else u'|%04X'%ord(c)
+  msg = encodedmsg
+  bot.log.msg("Sending encoded response: '%s'" % msg)
   params, cookiejar = sessions.get(channel, [post_params, {}])
   sessions[channel] = [params, cookiejar]
   if not cookiejar: # Get initial session cookie
