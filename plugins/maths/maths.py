@@ -7,7 +7,7 @@ import re
 
 try:
   import pint
-  ureg = pint.UnitRegistry()
+  ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
   ureg.default_format = 'P'
   Quantity = ureg.Quantity
 except ImportError:
@@ -40,6 +40,7 @@ operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul, ast.Mod: op.mod
 functions = {}
 
 constants = dict(pi=math.pi, e=math.e, nan=float('nan'), inf=float('inf'))
+ucode_repls = {u'\u03A0': 'pi', u'\u2107':'e', u'\u221E':'inf' }
 
 safe_functions = ['ceil', 'fabs', 'floor', 'trunc', 'exp', 'sqrt', 'log', 'log10',
                   'acos', 'asin', 'atan', 'cos', 'sin', 'tan',
@@ -89,14 +90,27 @@ def eval_(node):
 
 @trigger('PRIVMSG', priority=1000)
 def eval_trigger(bot, user, channel, msg):
+  global ucode_repls
   if not user.startswith(channel):
     if not msg.startswith(bot.nickname):
       return True
   if msg.startswith(bot.nickname):
     msg = re.sub(bot.nickname + '\\S+', '', msg).strip()
+
+  msg = msg.decode('utf8')
+  for u,s in ucode_repls.items():
+    msg = msg.replace(u,s)
+  msg = msg.encode('utf8')
+
+  # Split out the unit conversion op
+  msg, _, endunit = msg.partition(' to ')
+  endunit = endunit.strip()
+
+  # Convert '1 foot' to '1*foot'
+  # since ast can't compile "NUM NAME", only "NUM OP NAME"
+  msg = re.sub(r'([^*\/\s])\s+(\w+)', r'\1 * \2', msg)
+
   try:
-    msg, _, endunit = msg.partition(' to ')
-    endunit = endunit.strip()
     res = eval_(ast.parse(msg, mode='eval').body)
     if endunit: res = res.to(endunit)
   except Exception as e:
