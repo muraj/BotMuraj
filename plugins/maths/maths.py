@@ -42,7 +42,7 @@ functions = {}
 constants = dict(pi=math.pi, e=math.e, nan=float('nan'), inf=float('inf'))
 ucode_repls = {u'\u03A0': 'pi', u'\u2107':'e', u'\u221E':'inf' }
 
-safe_functions = ['ceil', 'fabs', 'floor', 'trunc', 'exp', 'sqrt', 'log', 'log10',
+safe_functions = ['ceil', 'fabs', 'floor', 'trunc', 'exp', 'log', 'log10',
                   'acos', 'asin', 'atan', 'cos', 'sin', 'tan',
                   'acosh', 'asinh', 'atanh', 'cosh', 'sinh', 'tanh',
                   'erf', 'erfc', 'gamma', 'lgamma',
@@ -63,6 +63,7 @@ for f in safe_functions:
 
 functions['fact'] = lambda x: functions['gamma'](x+1)
 functions['pow'] = safe_pow
+functions['sqrt'] = lambda x: functions['pow'](x, 0.5)
 
 def eval_(node):
   global functions, constants
@@ -75,6 +76,7 @@ def eval_(node):
   elif isinstance(node, ast.UnaryOp):
     return operators[type(node.op)](eval_(node.operand))
   elif isinstance(node, ast.Call):
+    print node.args
     args = [ eval_(arg) for arg in node.args ]
     return functions[node.func.id](*args)
   elif isinstance(node, ast.Compare):
@@ -108,9 +110,12 @@ def eval_trigger(bot, user, channel, msg):
 
   # Convert '1 foot' to '1*foot'
   # since ast can't compile "NUM NAME", only "NUM OP NAME"
-  msg = re.sub(r'([^*\/\s])\s+(\w+)', r'\1 * \2', msg)
+  msg = re.sub(r'([^*\/\s])\s+([A-Za-z]+)', r'\1 * \2', msg)
+  # Replace keyword 'in' with 'inch'
+  msg = re.sub(r'\bin\b', 'inch', msg)
 
   try:
+    bot.log.msg("Evaluating '%s'" % msg)
     res = eval_(ast.parse(msg, mode='eval').body)
     if endunit: res = res.to(endunit)
   except Exception as e:
