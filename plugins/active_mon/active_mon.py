@@ -21,9 +21,7 @@ class BloomFilter(object):
     self._k = int(log(2) * self._m / self._n) + 1
     self.hash_func = hash_f
 
-    initialize_file = not os.path.exists(filename)
-
-    if not initialize_file:
+    if os.path.exists(filename):
       self._file = open(filename, 'r+b')
     else: # Create the file
       self._file = open(filename, 'w+b')
