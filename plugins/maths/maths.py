@@ -4,6 +4,7 @@ import operator as op
 import math
 import cmath
 import re
+import string
 
 try:
   import pint
@@ -42,6 +43,14 @@ functions = {}
 constants = dict(pi=math.pi, e=math.e, nan=float('nan'), inf=float('inf'))
 ucode_repls = {u'\u03A0': 'pi', u'\u2107':'e', u'\u221E':'inf' }
 
+base_repls = {'binary': 2, 'ternary':3, 'quaternary':4, 'quinary':5,
+              'senary':6, 'oct':8, 'octal':8, 'decimal':10, 'dec':10, 
+              'undecimal':11, 'duodecimal':12, 'tridecimal':13, 'tetradecimal':14,
+              'pentadecimal':15, 'hex':16, 'hexadecimal':16, 'vigesimal':20,
+              'tetravigesimal':24, 'heptavigesimal':27, 'trigesimal':30,
+              'duotrigesimal':32, 'hexatrigesimal':36, 'sexagesimal':60,
+              'tetrasexagesimal':64, 'pentoctogesimal':85 }
+
 safe_functions = ['ceil', 'fabs', 'floor', 'trunc', 'exp', 'log', 'log10',
                   'acos', 'asin', 'atan', 'cos', 'sin', 'tan',
                   'acosh', 'asinh', 'atanh', 'cosh', 'sinh', 'tanh',
@@ -68,9 +77,10 @@ functions['sqrt'] = lambda x: functions['pow'](x, 0.5)
 def eval_(node):
   global functions, constants
   if isinstance(node, ast.Num):
-    return node.n
+    return ureg.Quantity(node.n)
   elif isinstance(node, ast.Name):
-    return constants.get(node.id, None) or ureg(node.id)
+    if node.id in constants: return ureg.Quantity(constants[node.id])
+    return ureg(node.id)
   elif isinstance(node, ast.BinOp):
     return operators[type(node.op)](eval_(node.left), eval_(node.right))
   elif isinstance(node, ast.UnaryOp):
@@ -90,6 +100,16 @@ def eval_(node):
   else:
     raise TypeError(node)
 
+def to_base(n, b, d):
+  if n == 0: return ''
+  nb, r = divmod(n, b)
+  return to_base(nb, b, d) + d[r]
+
+def frac_to_base(f, b, d, perc=8, pt='.'):
+  if f == 0 or perc == 0: return ''
+  n, f = divmod(f,1)
+  return to_base(int(n), b, d) + pt + frac_to_base(f*b, b, d, perc-1, '')
+
 @trigger('PRIVMSG', priority=1000)
 def eval_trigger(bot, user, channel, msg):
   global ucode_repls
@@ -106,7 +126,10 @@ def eval_trigger(bot, user, channel, msg):
 
   # Split out the unit conversion op
   msg, _, endunit = msg.partition(' to ')
-  endunit = endunit.strip()
+  endunit = endunit.strip().lower()
+  # Replace common name with base number
+  if endunit in base_repls:
+    endunit = 'base'+str(base_repls[endunit])
 
   # Convert '1 foot' to '1*foot'
   # since ast can't compile "NUM NAME", only "NUM OP NAME"
@@ -114,12 +137,26 @@ def eval_trigger(bot, user, channel, msg):
   # Replace keyword 'in' with 'inch'
   msg = re.sub(r'\bin\b', 'inch', msg)
 
-  try:
-    bot.log.msg("Evaluating '%s'" % msg)
-    res = eval_(ast.parse(msg, mode='eval').body)
-    if endunit: res = res.to(endunit)
-  except Exception as e:
-    bot.log.msg(str(e))
-    return True
+  #try:
+  bot.log.msg("Evaluating '%s'" % msg)
+  res = eval_(ast.parse(msg, mode='eval').body)
+  if endunit.startswith('base'):
+    base = int(endunit[4:])
+    # enough to go to base 85
+    alpha = string.digits + string.letters + '.-:+=^!/*?&<>()[]{}@%$#'
+    # Special alphabet bases
+    if base == 32: alpha = string.ascii_uppercase + string.digits[2:8]
+    elif base == 64: alpha = string.ascii_uppercase + string.ascii_lowercase + string.digits + '+/'
+    elif base > 85:
+      answer = 'Base too big...'
+    answer = '-' if res.magnitude < 0 else ''
+    answer += frac_to_base(abs(res.magnitude), base, alpha)
+    answer += u''.join([unichr(0x2080 + ord(c) - ord('0')) for c in str(base)]).encode('utf8')
+    if len(res.units) != 0:
+      answer += ' ' + pint.formatting.format_unit(res.units, 'P').encode('utf8') # Already encoded
+  elif endunit: answer = unicode(res.to(endunit)).encode('utf8')
+  #except Exception as e:
+  #  bot.log.msg(str(e))
+  #  return True
   user,_,_ = user.partition('!')
-  bot.msg(channel, "%s: %s" % (user, unicode(res).encode('utf8')))
+  bot.msg(channel, "%s: %s" % (user, answer))
