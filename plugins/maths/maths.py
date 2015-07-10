@@ -77,7 +77,7 @@ functions['sqrt'] = lambda x: functions['pow'](x, 0.5)
 def eval_(node):
   global functions, constants
   if isinstance(node, ast.Num):
-    return ureg.Quantity(node.n)
+    return node.n
   elif isinstance(node, ast.Name):
     if node.id in constants: return ureg.Quantity(constants[node.id])
     return ureg(node.id)
@@ -110,6 +110,12 @@ def frac_to_base(f, b, d, perc=8, pt='.'):
   n, f = divmod(f,1)
   return to_base(int(n), b, d) + pt + frac_to_base(f*b, b, d, perc-1, '')
 
+def quantity_to_str(q):
+  ret = str(q.magnitude)
+  if len(q.units) != 0:
+    ret += ' ' + pint.formatting.format_unit(q.units, 'P').encode('utf8')
+  return ret
+
 @trigger('PRIVMSG', priority=1000)
 def eval_trigger(bot, user, channel, msg):
   global ucode_repls
@@ -140,6 +146,8 @@ def eval_trigger(bot, user, channel, msg):
   #try:
   bot.log.msg("Evaluating '%s'" % msg)
   res = eval_(ast.parse(msg, mode='eval').body)
+  if not isinstance(res, Quantity):
+    res = Quantity(res)
   if endunit.startswith('base'):
     base = int(endunit[4:])
     # enough to go to base 85
@@ -154,7 +162,8 @@ def eval_trigger(bot, user, channel, msg):
     answer += u''.join([unichr(0x2080 + ord(c) - ord('0')) for c in str(base)]).encode('utf8')
     if len(res.units) != 0:
       answer += ' ' + pint.formatting.format_unit(res.units, 'P').encode('utf8') # Already encoded
-  elif endunit: answer = unicode(res.to(endunit)).encode('utf8')
+  else:
+    answer = quantity_to_str((endunit and res.to(endunit)) or res)
   #except Exception as e:
   #  bot.log.msg(str(e))
   #  return True
